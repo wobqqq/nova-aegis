@@ -1,11 +1,9 @@
 name: Security audit
 
-# composer audit and npm audit also run in CI on every change; this catches an advisory
-# published while the repository is quiet.
+# composer audit and npm audit also run in CI on every change; run this by hand from
+# the Actions tab to check the locked dependencies between changes.
 
 on:
-  schedule:
-    - cron: '17 5 * * 1'
   workflow_dispatch:
 
 permissions:
