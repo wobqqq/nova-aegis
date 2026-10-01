@@ -29,17 +29,6 @@ jobs:
           coverage: pcov
           tools: none
 
-      - name: Authenticate with the Nova repository
-        env:
-          NOVA_USERNAME: ${{ secrets.NOVA_USERNAME }}
-          NOVA_LICENSE_KEY: ${{ secrets.NOVA_LICENSE_KEY }}
-        run: |
-          if [ -z "$NOVA_USERNAME" ] || [ -z "$NOVA_LICENSE_KEY" ]; then
-            echo "::error::Add the NOVA_USERNAME and NOVA_LICENSE_KEY repository secrets: laravel/nova is installed from nova.laravel.com"
-            exit 1
-          fi
-          composer config --global http-basic.nova.laravel.com "$NOVA_USERNAME" "$NOVA_LICENSE_KEY"
-
       - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
       - name: Static checks
@@ -91,7 +80,7 @@ jobs:
           tools: none
 
       - name: Lint every PHP file
-        run: find src config database routes tests resources -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null
+        run: find src config database routes tests resources stubs -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null
 
   workflows:
     name: Workflows
