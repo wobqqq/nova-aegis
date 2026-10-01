@@ -1,0 +1,45 @@
+# One pull request a week per ecosystem, lock files only: the version ranges in
+# composer.json and package.json move on purpose, never by a bot. Nova comes from
+# nova.laravel.com, read with the Dependabot secrets NOVA_USERNAME / NOVA_LICENSE_KEY.
+version: 2
+
+registries:
+  nova:
+    type: composer-repository
+    url: https://nova.laravel.com
+    username: ${{secrets.NOVA_USERNAME}}
+    password: ${{secrets.NOVA_LICENSE_KEY}}
+
+updates:
+  - package-ecosystem: composer
+    directory: /
+    registries: [nova]
+    schedule:
+      interval: weekly
+      day: monday
+    versioning-strategy: lockfile-only
+    open-pull-requests-limit: 3
+    groups:
+      composer:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    versioning-strategy: lockfile-only
+    open-pull-requests-limit: 3
+    groups:
+      npm:
+        patterns: ['*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns: ['*']

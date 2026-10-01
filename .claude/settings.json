@@ -1,0 +1,76 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "attribution": {
+        "commit": "",
+        "pr": ""
+    },
+    "permissions": {
+        "allow": [
+            "Bash(make install)",
+            "Bash(make code.fix)",
+            "Bash(make code.check)",
+            "Bash(make composer.code.stan)",
+            "Bash(make test)",
+            "Bash(make test.coverage)",
+            "Bash(make test.mutate)",
+            "Bash(make ready)",
+            "Bash(make npm.build)",
+            "Bash(make npm.code.fix)",
+            "Bash(make npm.code.check)",
+            "Bash(make npm.test)",
+            "Bash(make npm.test.coverage)",
+            "Bash(docker compose run --rm node npm run:*)",
+            "Bash(docker compose run --rm php composer:*)",
+            "Bash(docker compose run --rm php vendor/bin/pest:*)",
+            "Bash(docker compose run --rm php vendor/bin/phpstan:*)",
+            "Bash(docker compose run --rm php vendor/bin/php-cs-fixer:*)",
+            "Bash(docker compose run --rm php vendor/bin/rector:*)",
+            "Bash(git status)",
+            "Bash(git diff:*)",
+            "Bash(git log:*)",
+            "Bash(git show:*)",
+            "Bash(git branch:*)",
+            "Bash(git blame:*)",
+            "Bash(ls:*)",
+            "Bash(cat:*)",
+            "Bash(head:*)",
+            "Bash(tail:*)",
+            "Bash(grep:*)",
+            "Bash(rg:*)",
+            "Bash(find:*)",
+            "Bash(wc:*)",
+            "Bash(diff:*)"
+        ],
+        "deny": [
+            "Bash(rm -rf:*)",
+            "Bash(sudo:*)",
+            "Bash(git push --force:*)",
+            "Bash(git reset --hard:*)",
+            "Read(**/.env)",
+            "Read(**/.env.*)",
+            "Read(**/auth.json)",
+            "Read(**/*.pem)",
+            "Read(**/*.key)",
+            "Bash(git push origin main)",
+            "Bash(git push origin main:*)",
+            "Bash(git push origin HEAD:main:*)",
+            "Bash(git push -f:*)",
+            "Bash(git push --force-with-lease:*)"
+        ]
+    },
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "statusMessage": "Formatting the changed PHP file",
+                        "timeout": 90,
+                        "command": "cd \"$CLAUDE_PROJECT_DIR\" && jq -r '.tool_input.file_path // empty' | { read -r f; rel=\"${f#$CLAUDE_PROJECT_DIR/}\"; case \"$rel\" in vendor/*) exit 0 ;; *.php) UID=$(id -u) GID=$(id -g) docker compose run --rm -T php vendor/bin/php-cs-fixer fix --quiet \"$rel\" ;; esac; } >/dev/null 2>&1 || true"
+                    }
+                ]
+            }
+        ]
+    }
+}

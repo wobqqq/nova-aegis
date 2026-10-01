@@ -1,0 +1,16 @@
+# Changelog
+
+All notable changes are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [semantic versioning](https://semver.org/).
+
+## [Unreleased]
+
+### Added
+
+- The Aegis tool: an overview of the security checks, the dependency audit, the settings and the scanners.
+- A dashboard card with the failing checks and warnings.
+- Hardening: session cookies, the password policy, forced HTTPS and HSTS, all off until enabled.
+- Checks: debug mode, environment, application key, HTTPS URL, Nova path, session cookie, password policy, stale administrators, dependency advisories.
+- `composer audit` from the dashboard, the console (`aegis:audit`) and a daily schedule.
+- Scanners: sensitive files over HTTP, open TCP ports and TLS certificates, limited to the listed targets.
+- The module API (`Aegis::module()`, `Aegis::check()`, `Aegis::settings()`, `SettingsSaved`) for add-on packages.
+- `aegis:check` and `aegis:disable` console commands.
