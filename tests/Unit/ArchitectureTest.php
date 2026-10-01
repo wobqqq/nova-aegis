@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+use Wobqqq\Aegis\Audit\Advisory;
+use Wobqqq\Aegis\Audit\AuditResult;
+use Wobqqq\Aegis\Checks\CheckResult;
+use Wobqqq\Aegis\Hardening\HardeningSettings;
+use Wobqqq\Aegis\Scanners\Certificate;
+use Wobqqq\Aegis\Scanners\ScanResult;
+use Wobqqq\Aegis\Settings\Field;
+
 arch('every file declares strict types')
     ->expect('Wobqqq\Aegis')
     ->toUseStrictTypes();
@@ -11,9 +19,14 @@ arch('no debugging calls are left behind')
     ->not->toBeUsed();
 
 arch('value objects are immutable')
-    ->expect([Wobqqq\Aegis\Checks\CheckResult::class, Wobqqq\Aegis\Scanners\ScanResult::class, Wobqqq\Aegis\Audit\AuditResult::class, Wobqqq\Aegis\Hardening\HardeningSettings::class, Wobqqq\Aegis\Settings\Field::class])
+    ->expect([CheckResult::class, ScanResult::class, AuditResult::class, Advisory::class, Certificate::class, HardeningSettings::class, Field::class])
     ->toBeFinal()
     ->toBeReadonly();
+
+arch('every class is final')
+    ->expect('Wobqqq\Aegis')
+    ->classes()
+    ->toBeFinal();
 
 arch('enums back every shared code')
     ->expect('Wobqqq\Aegis\Enums')

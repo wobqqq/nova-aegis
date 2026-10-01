@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Scanners;
 
+use Illuminate\Support\Facades\Date;
 use Wobqqq\Aegis\Settings\SettingsRepository;
 use Wobqqq\Aegis\Support\Values;
 
@@ -12,7 +13,7 @@ use Wobqqq\Aegis\Support\Values;
  */
 final readonly class Scanner
 {
-    private const EXPIRY_WARNING_DAYS = 14;
+    private const int EXPIRY_WARNING_DAYS = 14;
 
     public function __construct(
         private SettingsRepository $settings,
@@ -43,7 +44,7 @@ final readonly class Scanner
             $results[] = new ScanResult($url, (string)$status, $status === 200);
         }
 
-        usort($results, static fn (ScanResult $a, ScanResult $b): int => [$b->exposed, $a->target] <=> [$a->exposed, $b->target]);
+        usort($results, static fn (ScanResult $a, ScanResult $b): int => $a->exposed === $b->exposed ? strcmp($a->target, $b->target) : ($a->exposed ? -1 : 1));
 
         return $results;
     }
@@ -86,14 +87,14 @@ final readonly class Scanner
                 $certificate = $this->tls->certificate($target, $port);
                 $name = sprintf('%s:%d', $target, $port);
 
-                if ($certificate === null) {
+                if (!$certificate instanceof Certificate) {
                     $results[] = new ScanResult($name, 'invalid', true);
 
                     continue;
                 }
 
-                $expiresSoon = $certificate['expires_on']->lt(\Illuminate\Support\Facades\Date::now()->addDays(self::EXPIRY_WARNING_DAYS));
-                $results[] = new ScanResult($name, $expiresSoon ? 'expires-soon' : 'valid', $expiresSoon, $certificate['expires_on']->toDateString());
+                $expiresSoon = $certificate->expiresOn->lt(Date::now()->addDays(self::EXPIRY_WARNING_DAYS));
+                $results[] = new ScanResult($name, $expiresSoon ? 'expires-soon' : 'valid', $expiresSoon, $certificate->expiresOn->toDateString());
             }
 
             return $results;

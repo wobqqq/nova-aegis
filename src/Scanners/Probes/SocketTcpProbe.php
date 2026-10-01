@@ -2,25 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Wobqqq\Aegis\Scanners;
+namespace Wobqqq\Aegis\Scanners\Probes;
 
-class TcpProbe
+use Override;
+use Wobqqq\Aegis\Scanners\TcpProbe;
+
+/**
+ * Every port is dialled at once and the whole probe waits at most one timeout.
+ */
+final readonly class SocketTcpProbe implements TcpProbe
 {
-    public const OPEN = 'open';
-
-    public const CLOSED = 'closed';
-
-    public function __construct(private readonly int $timeout = 2)
+    public function __construct(private int $timeout = 2)
     {
     }
 
-    /**
-     * Every port is dialled at once and the whole probe waits at most one timeout.
-     *
-     * @param list<int> $ports
-     *
-     * @return array<int, string>
-     */
+    #[Override]
     public function states(string $ip, array $ports): array
     {
         $host = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false ? sprintf('[%s]', $ip) : $ip;
@@ -51,7 +47,9 @@ class TcpProbe
             $except = null;
             $seconds = (int)$left;
 
-            if (@stream_select($read, $write, $except, $seconds, (int)(($left - $seconds) * 1_000_000)) < 1) {
+            $ready = @stream_select($read, $write, $except, $seconds, (int)(($left - $seconds) * 1_000_000));
+
+            if ($ready === false || $ready === 0) {
                 break;
             }
 

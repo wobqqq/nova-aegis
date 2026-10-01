@@ -18,7 +18,7 @@ use Wobqqq\Aegis\Settings\SettingsRepository;
  */
 function harden(array $values): HardeningService
 {
-    resolve(SettingsRepository::class)->save(HardeningModule::KEY, $values + (new HardeningModule())->defaults());
+    resolve(SettingsRepository::class)->save(HardeningModule::KEY, $values + new HardeningModule()->defaults());
 
     $service = resolve(HardeningService::class);
     $service->apply();

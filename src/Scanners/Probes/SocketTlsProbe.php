@@ -2,23 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Wobqqq\Aegis\Scanners;
+namespace Wobqqq\Aegis\Scanners\Probes;
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use OpenSSLCertificate;
+use Override;
+use Wobqqq\Aegis\Scanners\Certificate;
+use Wobqqq\Aegis\Scanners\TlsProbe;
 
-class TlsProbe
+final readonly class SocketTlsProbe implements TlsProbe
 {
-    public function __construct(private readonly int $timeout = 10)
+    public function __construct(private int $timeout = 10)
     {
     }
 
-    /**
-     * The certificate's validity dates, or null when no valid certificate is presented.
-     *
-     * @return array{issued_on: Carbon, expires_on: Carbon}|null
-     */
-    public function certificate(string $host, int $port): ?array
+    #[Override]
+    public function certificate(string $host, int $port): ?Certificate
     {
         $context = stream_context_create(['ssl' => [
             'capture_peer_cert' => true,
@@ -45,9 +44,9 @@ class TlsProbe
             return null;
         }
 
-        return [
-            'issued_on' => \Illuminate\Support\Facades\Date::createFromTimestamp($data['validFrom_time_t']),
-            'expires_on' => \Illuminate\Support\Facades\Date::createFromTimestamp($data['validTo_time_t']),
-        ];
+        return new Certificate(
+            Date::createFromTimestamp($data['validFrom_time_t']),
+            Date::createFromTimestamp($data['validTo_time_t']),
+        );
     }
 }

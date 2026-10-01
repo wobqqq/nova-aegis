@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Console;
 
 use Illuminate\Console\Command;
+use Wobqqq\Aegis\Audit\Advisory;
 use Wobqqq\Aegis\Audit\ComposerAudit;
 
 final class AuditCommand extends Command
 {
-    /** @var string */
     protected $signature = 'aegis:audit';
 
-    /** @var string */
     protected $description = 'Check the installed packages for security advisories and keep the result for the Aegis dashboard.';
 
     public function handle(ComposerAudit $audit): int
@@ -32,7 +31,7 @@ final class AuditCommand extends Command
         }
 
         $this->table(['Package', 'Advisory', 'CVE'], array_map(
-            static fn (array $advisory): array => [$advisory['package'], $advisory['title'], $advisory['cve'] ?? '-'],
+            static fn (Advisory $advisory): array => [$advisory->package, $advisory->title, $advisory->cve ?? '-'],
             $result->advisories,
         ));
 

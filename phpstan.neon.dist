@@ -1,7 +1,10 @@
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+
 parameters:
     level: max
     phpVersion:
-        min: 80200
+        min: 80400
         max: 80499
     paths:
         - src
@@ -17,3 +20,22 @@ parameters:
     strictRules:
         dynamicCallOnStaticMethod: false
     treatPhpDocTypesAsCertain: false
+    checkMissingOverrideMethodAttribute: true
+    checkUninitializedProperties: true
+    checkImplicitMixed: true
+    checkBenevolentUnionTypes: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    reportAnyTypeWideningInVarTag: true
+    reportPossiblyNonexistentConstantArrayOffset: true
+    reportPossiblyNonexistentGeneralArrayOffset: true
+    reportUnmatchedIgnoredErrors: true
+    reportWrongPhpDocTypeInVarTag: true
+    shipmonkRules:
+        # The package does not declare checked exceptions with @throws, so the rule has nothing to enforce.
+        forbidCheckedExceptionInCallable:
+            enabled: false
+    ignoreErrors:
+        # Pest marks its expectation API @internal; tests are its intended callers.
+        -
+            identifier: method.internalClass
+            path: tests/*

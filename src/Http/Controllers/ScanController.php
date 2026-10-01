@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Wobqqq\Aegis\Scanners\Scanner;
 use Wobqqq\Aegis\Scanners\ScanResult;
+use Wobqqq\Aegis\Support\Lang;
 
 final readonly class ScanController
 {
@@ -41,10 +42,9 @@ final readonly class ScanController
      */
     private function target(Request $request, string $field, array $rules): string
     {
-        /** @var array<string, string> $validated */
-        $validated = $request->validate([$field => $rules]);
+        $request->validate([$field => $rules]);
 
-        return trim($validated[$field]);
+        return trim($request->string($field)->toString());
     }
 
     /**
@@ -52,7 +52,7 @@ final readonly class ScanController
      */
     private function answer(?array $results): JsonResponse
     {
-        abort_if($results === null, 422, (string)__('aegis::aegis.scanners.unlisted'));
+        abort_if($results === null, 422, Lang::get('aegis::aegis.scanners.unlisted'));
 
         return new JsonResponse([
             'results' => $results,

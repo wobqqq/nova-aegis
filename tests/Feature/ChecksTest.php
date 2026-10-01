@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Date;
 use Wobqqq\Aegis\Aegis;
 use Wobqqq\Aegis\Audit\AuditResult;
 use Wobqqq\Aegis\Audit\AuditStore;
@@ -59,10 +60,10 @@ it('flags a weak session cookie', function (): void {
 it('reads the password policy from the hardening settings', function (): void {
     expect(check('password')->status)->toBe(Status::WARN);
 
-    resolve(SettingsRepository::class)->save(HardeningModule::KEY, ['enabled' => true, 'password_min_length' => 8] + (new HardeningModule())->defaults());
+    resolve(SettingsRepository::class)->save(HardeningModule::KEY, ['enabled' => true, 'password_min_length' => 8] + new HardeningModule()->defaults());
     expect(check('password')->status)->toBe(Status::WARN);
 
-    resolve(SettingsRepository::class)->save(HardeningModule::KEY, ['enabled' => true, 'password_min_length' => 14] + (new HardeningModule())->defaults());
+    resolve(SettingsRepository::class)->save(HardeningModule::KEY, ['enabled' => true, 'password_min_length' => 14] + new HardeningModule()->defaults());
     expect(check('password')->status)->toBe(Status::PASS);
 });
 
@@ -74,7 +75,7 @@ it('finds the accounts nobody signed in with', function (): void {
 
     expect(check('stale_admins')->status)->toBe(Status::PASS);
 
-    editor()->forceFill(['last_login_at' => Illuminate\Support\Facades\Date::now()->subDays(45)])->save();
+    editor()->forceFill(['last_login_at' => Date::now()->subDays(45)])->save();
 
     expect(check('stale_admins')->status)->toBe(Status::WARN)->and(check('stale_admins')->message)->toContain('1 accounts');
 });
@@ -96,7 +97,7 @@ it('reports the last dependency audit', function (): void {
     $store->put(AuditResult::failed('broken'));
     expect(check('advisories')->status)->toBe(Status::WARN);
 
-    $store->put(new AuditResult(Illuminate\Support\Facades\Date::now()->subDays(10), [], []));
+    $store->put(new AuditResult(Date::now()->subDays(10), [], []));
     expect(check('advisories')->status)->toBe(Status::WARN);
 
     $store->put(AuditResult::fromReport(['advisories' => []]));
@@ -105,6 +106,7 @@ it('reports the last dependency audit', function (): void {
 
 it('keeps going when a check throws, without leaking its error', function (): void {
     Aegis::check(new class () implements Check {
+        #[Override]
         public function run(): CheckResult
         {
             throw new RuntimeException('secret detail');

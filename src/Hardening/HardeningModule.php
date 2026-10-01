@@ -4,29 +4,35 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Hardening;
 
+use Override;
 use Wobqqq\Aegis\Checks\CheckResult;
 use Wobqqq\Aegis\Contracts\Module;
 use Wobqqq\Aegis\Settings\Field;
+use Wobqqq\Aegis\Support\Lang;
 
 final class HardeningModule implements Module
 {
-    public const KEY = 'hardening';
+    public const string KEY = 'hardening';
 
+    #[Override]
     public function key(): string
     {
         return self::KEY;
     }
 
+    #[Override]
     public function label(): string
     {
-        return (string)__('aegis::aegis.hardening.label');
+        return Lang::get('aegis::aegis.hardening.label');
     }
 
+    #[Override]
     public function description(): string
     {
-        return (string)__('aegis::aegis.hardening.description');
+        return Lang::get('aegis::aegis.hardening.description');
     }
 
+    #[Override]
     public function defaults(): array
     {
         return [
@@ -49,6 +55,7 @@ final class HardeningModule implements Module
         ];
     }
 
+    #[Override]
     public function rules(): array
     {
         return [
@@ -71,10 +78,11 @@ final class HardeningModule implements Module
         ];
     }
 
+    #[Override]
     public function fields(): array
     {
-        $field = static fn (string $name): string => (string)__('aegis::aegis.hardening.fields.' . $name);
-        $help = static fn (string $name): string => (string)__('aegis::aegis.hardening.help.' . $name);
+        $field = static fn (string $name): string => Lang::get('aegis::aegis.hardening.fields.' . $name);
+        $help = static fn (string $name): string => Lang::get('aegis::aegis.hardening.help.' . $name);
 
         return [
             Field::toggle('enabled', $field('enabled'), $help('enabled')),
@@ -96,12 +104,13 @@ final class HardeningModule implements Module
         ];
     }
 
+    #[Override]
     public function status(array $values): CheckResult
     {
         $label = $this->label();
 
         return HardeningSettings::fromArray($values)->enabled
-            ? CheckResult::pass(self::KEY, $label, (string)__('aegis::aegis.hardening.on'))
-            : CheckResult::warn(self::KEY, $label, (string)__('aegis::aegis.hardening.off'));
+            ? CheckResult::pass(self::KEY, $label, Lang::get('aegis::aegis.hardening.on'))
+            : CheckResult::warn(self::KEY, $label, Lang::get('aegis::aegis.hardening.off'));
     }
 }

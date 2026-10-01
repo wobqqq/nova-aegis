@@ -6,17 +6,19 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Nova;
 use Wobqqq\Aegis\Nova\AegisCard;
 use Wobqqq\Aegis\Nova\AegisTool;
+use Wobqqq\Aegis\Tests\Fixtures\User;
 
 it('shows the tool and the card to the administrators the gate lets in', function (): void {
     $adminUser = admin();
     $editorUser = editor();
     $admin = Request::create('/nova');
-    $admin->setUserResolver(static fn (): Wobqqq\Aegis\Tests\Fixtures\User => $adminUser);
-    $editor = Request::create('/nova');
-    $editor->setUserResolver(static fn (): Wobqqq\Aegis\Tests\Fixtures\User => $editorUser);
+    $admin->setUserResolver(static fn (): User => $adminUser);
 
-    expect((new AegisTool())->authorize($admin))->toBeTrue()
-        ->and((new AegisTool())->authorize($editor))->toBeFalse()
+    $editor = Request::create('/nova');
+    $editor->setUserResolver(static fn (): User => $editorUser);
+
+    expect(new AegisTool()->authorize($admin))->toBeTrue()
+        ->and(new AegisTool()->authorize($editor))->toBeFalse()
         ->and(AegisCard::make()->authorize($admin))->toBeTrue()
         ->and(AegisCard::make()->authorize($editor))->toBeFalse();
 });

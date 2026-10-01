@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Checks\Core;
 
 use Illuminate\Contracts\Config\Repository as Config;
+use Override;
 use Wobqqq\Aegis\Checks\CheckResult;
 use Wobqqq\Aegis\Contracts\Check;
+use Wobqqq\Aegis\Support\Lang;
 
 final readonly class DebugModeCheck implements Check
 {
@@ -14,12 +16,13 @@ final readonly class DebugModeCheck implements Check
     {
     }
 
+    #[Override]
     public function run(): CheckResult
     {
-        $label = (string)__('aegis::aegis.checks.debug.label');
+        $label = Lang::get('aegis::aegis.checks.debug.label');
 
         return $this->config->get('app.debug') === false
-            ? CheckResult::pass('debug', $label, (string)__('aegis::aegis.checks.debug.pass'))
-            : CheckResult::fail('debug', $label, (string)__('aegis::aegis.checks.debug.fail'));
+            ? CheckResult::pass('debug', $label, Lang::get('aegis::aegis.checks.debug.pass'))
+            : CheckResult::fail('debug', $label, Lang::get('aegis::aegis.checks.debug.fail'));
     }
 }

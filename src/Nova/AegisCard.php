@@ -8,13 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Card;
 use Laravel\Nova\Nova;
+use Override;
 
-class AegisCard extends Card
+final class AegisCard extends Card
 {
-    /** @var string */
     public $width = '1/2';
 
-    /** @var string */
     public $height = 'dynamic';
 
     public function __construct(?string $component = null)
@@ -24,6 +23,7 @@ class AegisCard extends Card
         $this->canSee(static fn (Request $request): bool => Gate::has(AegisTool::GATE) && Gate::forUser($request->user())->allows(AegisTool::GATE));
     }
 
+    #[Override]
     public function component(): string
     {
         return 'aegis-card';
@@ -32,6 +32,7 @@ class AegisCard extends Card
     /**
      * @return array<string, mixed>
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), ['toolPath' => Nova::url('/aegis')]);

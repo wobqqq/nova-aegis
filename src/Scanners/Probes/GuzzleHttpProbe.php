@@ -2,42 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Wobqqq\Aegis\Scanners;
+namespace Wobqqq\Aegis\Scanners\Probes;
 
+use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use Override;
 use Psr\Http\Message\ResponseInterface;
+use Wobqqq\Aegis\Scanners\HttpProbe;
 
-class HttpProbe
+final readonly class GuzzleHttpProbe implements HttpProbe
 {
     public function __construct(
-        private readonly ?Client $client = null,
-        private readonly int $timeout = 10,
-        private readonly int $concurrency = 7,
+        private Client $client = new Client(),
+        private int $timeout = 10,
+        private int $concurrency = 7,
     ) {
     }
 
-    /**
-     * The status code of each URL, or "error". Redirects are not followed: a sensitive path
-     * redirected to the home page would answer 200 there and read as exposed.
-     *
-     * @param list<string> $urls
-     *
-     * @return array<string, int|string>
-     */
+    #[Override]
     public function statuses(array $urls): array
     {
-        $client = $this->client ?? new Client();
-        $requests = static function (string ...$urls) {
-            foreach ($urls as $url) {
-                yield new Request('GET', $url);
-            }
-        };
-
         $statuses = [];
 
-        $pool = new Pool($client, $requests(...$urls), [
+        $pool = new Pool($this->client, $this->requests($urls), [
             'concurrency' => $this->concurrency,
             'options' => [
                 'timeout' => $this->timeout,
@@ -46,16 +35,28 @@ class HttpProbe
                 'allow_redirects' => false,
                 'headers' => ['User-Agent' => 'Aegis sensitive files scanner'],
             ],
-            'fulfilled' => static function (ResponseInterface $response, int|string $index) use (&$statuses, $urls): void {
-                $statuses[$urls[(int)$index]] = $response->getStatusCode();
+            'fulfilled' => static function (ResponseInterface $response, int|string $url) use (&$statuses): void {
+                $statuses[(string)$url] = $response->getStatusCode();
             },
-            'rejected' => static function (mixed $reason, int|string $index) use (&$statuses, $urls): void {
-                $statuses[$urls[(int)$index]] = 'error';
+            'rejected' => static function (mixed $reason, int|string $url) use (&$statuses): void {
+                $statuses[(string)$url] = 'error';
             },
         ]);
 
         $pool->promise()->wait();
 
         return $statuses;
+    }
+
+    /**
+     * @param list<string> $urls
+     *
+     * @return Generator<string, Request>
+     */
+    private function requests(array $urls): Generator
+    {
+        foreach ($urls as $url) {
+            yield $url => new Request('GET', $url);
+        }
     }
 }

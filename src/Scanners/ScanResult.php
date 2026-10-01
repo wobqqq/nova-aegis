@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Scanners;
 
 use JsonSerializable;
+use Override;
 
 final readonly class ScanResult implements JsonSerializable
 {
@@ -19,6 +20,7 @@ final readonly class ScanResult implements JsonSerializable
     /**
      * @return array{target: string, status: string, exposed: bool, detail: string|null}
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

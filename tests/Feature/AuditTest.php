@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
+use Mockery\MockInterface;
+
+use Wobqqq\Aegis\Audit\Advisory;
 use Wobqqq\Aegis\Audit\AuditResult;
 use Wobqqq\Aegis\Audit\AuditStore;
-
 use Wobqqq\Aegis\Audit\ComposerAudit;
 
 it('runs composer audit and keeps the advisories it reports', function (): void {
@@ -17,11 +21,11 @@ it('runs composer audit and keeps the advisories it reports', function (): void 
 
     $result = resolve(ComposerAudit::class)->run();
 
-    expect($result->advisories)->toBe([['package' => 'acme/lib', 'title' => 'SQL injection', 'cve' => 'CVE-2026-1', 'link' => 'https://example.com']])
+    expect($result->advisories)->toEqual([new Advisory('acme/lib', 'SQL injection', 'CVE-2026-1', 'https://example.com')])
         ->and($result->abandoned)->toBe(['old/pkg'])
         ->and(resolve(AuditStore::class)->last()?->advisories)->toHaveCount(1);
 
-    Process::assertRan(static fn (Illuminate\Process\PendingProcess $process): bool => $process->command === ['composer', 'audit', '--format=json', '--locked', '--no-interaction', '--abandoned=report']);
+    Process::assertRan(static fn (PendingProcess $process): bool => $process->command === ['composer', 'audit', '--format=json', '--locked', '--no-interaction', '--abandoned=report']);
 });
 
 it('records an audit that did not answer JSON as an error', function (): void {
@@ -63,9 +67,9 @@ it('records an audit that could not start', function (): void {
 });
 
 it('answers no audit when the cache cannot be read', function (): void {
-    /** @var Illuminate\Contracts\Cache\Repository&Mockery\MockInterface $cache */
-    $cache = Mockery::mock(Illuminate\Contracts\Cache\Repository::class);
+    /** @var MockInterface&Repository $cache */
+    $cache = Mockery::mock(Repository::class);
     $cache->allows('get')->andThrow(new RuntimeException('down'));
 
-    expect((new AuditStore($cache))->last())->toBeNull();
+    expect(new AuditStore($cache)->last())->toBeNull();
 });

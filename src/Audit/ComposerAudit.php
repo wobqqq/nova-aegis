@@ -28,8 +28,8 @@ final readonly class ComposerAudit
             $result = is_array($report)
                 ? AuditResult::fromReport($report)
                 : AuditResult::failed(trim($process->errorOutput()) !== '' ? 'composer audit did not answer with JSON.' : 'composer audit answered nothing.');
-        } catch (Throwable $e) {
-            $result = AuditResult::failed(sprintf('composer audit could not run: %s', class_basename($e)));
+        } catch (Throwable $throwable) {
+            $result = AuditResult::failed(sprintf('composer audit could not run: %s', class_basename($throwable)));
         }
 
         $this->store->put($result);

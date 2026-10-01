@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
+use Override;
+use Wobqqq\Aegis\Support\Lang;
 
-class AegisTool extends Tool
+final class AegisTool extends Tool
 {
-    public const GATE = 'viewAegis';
+    public const string GATE = 'viewAegis';
 
     public function __construct()
     {
@@ -21,14 +23,16 @@ class AegisTool extends Tool
         $this->canSee(static fn (Request $request): bool => Gate::has(self::GATE) && Gate::forUser($request->user())->allows(self::GATE));
     }
 
+    #[Override]
     public function boot(): void
     {
         Nova::script('aegis', __DIR__ . '/../../dist/js/tool.js');
         Nova::style('aegis', __DIR__ . '/../../dist/css/tool.css');
     }
 
+    #[Override]
     public function menu(Request $request): MenuSection
     {
-        return MenuSection::make((string)__('aegis::aegis.menu'))->path('/aegis')->icon('shield-check');
+        return MenuSection::make(Lang::get('aegis::aegis.menu'))->path('/aegis')->icon('shield-check');
     }
 }

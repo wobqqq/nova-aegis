@@ -6,12 +6,14 @@ namespace Wobqqq\Aegis;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Nova\Nova;
+use Override;
 use Throwable;
 use Wobqqq\Aegis\Audit\AuditStore;
 use Wobqqq\Aegis\Checks\CheckRegistry;
@@ -26,6 +28,9 @@ use Wobqqq\Aegis\Http\Middleware\Authorize;
 use Wobqqq\Aegis\Http\Middleware\TransportSecurity;
 use Wobqqq\Aegis\Modules\ModuleRegistry;
 use Wobqqq\Aegis\Scanners\HttpProbe;
+use Wobqqq\Aegis\Scanners\Probes\GuzzleHttpProbe;
+use Wobqqq\Aegis\Scanners\Probes\SocketTcpProbe;
+use Wobqqq\Aegis\Scanners\Probes\SocketTlsProbe;
 use Wobqqq\Aegis\Scanners\ScannersModule;
 use Wobqqq\Aegis\Scanners\TcpProbe;
 use Wobqqq\Aegis\Scanners\TlsProbe;
@@ -34,6 +39,7 @@ use Wobqqq\Aegis\Settings\SettingsRepository;
 
 final class AegisServiceProvider extends ServiceProvider
 {
+    #[Override]
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/aegis.php', 'aegis');
@@ -48,13 +54,13 @@ final class AegisServiceProvider extends ServiceProvider
             $app->make('events'),
         ));
         $this->app->singleton(AuditStore::class, static fn (Application $app): AuditStore => new AuditStore(self::cache($app)));
-        $this->app->bind(HttpProbe::class, static fn (Application $app): HttpProbe => new HttpProbe(
-            null,
-            self::integer($app, 'aegis.scanners.http_timeout', 10),
+        $this->app->bind(HttpProbe::class, static fn (Application $app): HttpProbe => new GuzzleHttpProbe(
+            timeout: self::integer($app, 'aegis.scanners.http_timeout', 10),
+            concurrency:
             self::integer($app, 'aegis.scanners.http_concurrency', 7),
         ));
-        $this->app->bind(TcpProbe::class, static fn (Application $app): TcpProbe => new TcpProbe(self::integer($app, 'aegis.scanners.tcp_timeout', 2)));
-        $this->app->bind(TlsProbe::class, static fn (Application $app): TlsProbe => new TlsProbe(self::integer($app, 'aegis.scanners.tls_timeout', 10)));
+        $this->app->bind(TcpProbe::class, static fn (Application $app): TcpProbe => new SocketTcpProbe(self::integer($app, 'aegis.scanners.tcp_timeout', 2)));
+        $this->app->bind(TlsProbe::class, static fn (Application $app): TlsProbe => new SocketTlsProbe(self::integer($app, 'aegis.scanners.tls_timeout', 10)));
     }
 
     public function boot(ModuleRegistry $modules, CheckRegistry $checks, Router $router): void
@@ -105,8 +111,8 @@ final class AegisServiceProvider extends ServiceProvider
     {
         try {
             $this->app->make(HardeningService::class)->apply();
-        } catch (Throwable $e) {
-            report($e);
+        } catch (Throwable $throwable) {
+            report($throwable);
         }
     }
 
@@ -123,7 +129,7 @@ final class AegisServiceProvider extends ServiceProvider
             ->group(__DIR__ . '/../routes/api.php');
     }
 
-    private static function cache(Application $app): \Illuminate\Contracts\Cache\Repository
+    private static function cache(Application $app): Repository
     {
         $store = $app->make(Config::class)->get('aegis.cache_store');
 
