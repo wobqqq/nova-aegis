@@ -4,6 +4,8 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+Breaking for code that extends the core: every class is now final, and an application that called `new HttpProbe()` (or the TCP / TLS probe) resolves the interface from the container instead. Modules and the settings stored in `aegis_settings` are unaffected.
+
 ### Added
 
 - Laravel 13 support; CI runs the suite on Laravel 12 and 13, and on PHP 8.5.
