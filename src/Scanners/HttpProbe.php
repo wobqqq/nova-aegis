@@ -46,11 +46,11 @@ class HttpProbe
                 'allow_redirects' => false,
                 'headers' => ['User-Agent' => 'Aegis sensitive files scanner'],
             ],
-            'fulfilled' => static function (ResponseInterface $response, int $index) use (&$statuses, $urls): void {
-                $statuses[$urls[$index]] = $response->getStatusCode();
+            'fulfilled' => static function (ResponseInterface $response, int|string $index) use (&$statuses, $urls): void {
+                $statuses[$urls[(int)$index]] = $response->getStatusCode();
             },
-            'rejected' => static function (mixed $reason, int $index) use (&$statuses, $urls): void {
-                $statuses[$urls[$index]] = 'error';
+            'rejected' => static function (mixed $reason, int|string $index) use (&$statuses, $urls): void {
+                $statuses[$urls[(int)$index]] = 'error';
             },
         ]);
 

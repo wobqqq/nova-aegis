@@ -4,7 +4,7 @@ Guidance for AI coding agents (Claude Code, Codex, Junie, Cursor) working in thi
 
 ## What this is
 
-**Aegis** (`wobqqq/nova-aegis`) is the core of a security suite for Laravel Nova (Laravel 12, PHP 8.2+). It:
+**Aegis** (`wobqqq/nova-aegis`) is the core of a security suite for Laravel Nova (Laravel 12 or 13, PHP 8.2+). It:
 
 - hardens the application at boot (`HardeningService::apply()`: session cookies, `Password::defaults()`, forced HTTPS; the `TransportSecurity` middleware for the HTTPS redirect and HSTS) from the **Aegis → Settings** tab;
 - runs the security checks (`Checks/Core`), `composer audit` (`Audit/`) and three scanners (`Scanners/`: sensitive files over HTTP, open TCP ports, TLS certificates);

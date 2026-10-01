@@ -61,7 +61,7 @@ Add-on packages register their own settings section, dashboard line and checks:
 ## 📦 Requirements
 
 - PHP 8.2 or higher
-- Laravel 12
+- Laravel 12 or 13
 - Laravel Nova 5
 
 ## 📥 Installation

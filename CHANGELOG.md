@@ -4,6 +4,10 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+### Added
+
+- Laravel 13 support; CI runs the suite on Laravel 12 and 13.
+
 ## [1.1.1] - 2026-10-01
 
 ### Changed
