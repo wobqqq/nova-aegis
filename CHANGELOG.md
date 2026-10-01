@@ -4,6 +4,8 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-01
+
 ### Added
 
 - The Aegis tool: an overview of the security checks, the dependency audit, the settings and the scanners.
@@ -14,3 +16,6 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 - Scanners: sensitive files over HTTP, open TCP ports and TLS certificates, limited to the listed targets.
 - The module API (`Aegis::module()`, `Aegis::check()`, `Aegis::settings()`, `SettingsSaved`) for add-on packages.
 - `aegis:check` and `aegis:disable` console commands.
+
+[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/wobqqq/nova-aegis/releases/tag/v1.0.0

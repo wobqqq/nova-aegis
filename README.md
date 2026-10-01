@@ -1,5 +1,6 @@
 # Aegis
 
+[![CI](https://github.com/wobqqq/nova-aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/wobqqq/nova-aegis/actions/workflows/ci.yml)
 [![Packagist](https://img.shields.io/packagist/v/wobqqq/nova-aegis)](https://packagist.org/packages/wobqqq/nova-aegis)
 [![Downloads](https://img.shields.io/packagist/dt/wobqqq/nova-aegis)](https://packagist.org/packages/wobqqq/nova-aegis)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)](https://github.com/wobqqq/nova-aegis/blob/main/composer.json)
