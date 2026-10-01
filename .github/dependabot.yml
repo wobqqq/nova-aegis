@@ -1,19 +1,11 @@
 # One pull request a week per ecosystem, lock files only: the version ranges in
-# composer.json and package.json move on purpose, never by a bot. Nova comes from
-# nova.laravel.com, read with the Dependabot secrets NOVA_USERNAME / NOVA_LICENSE_KEY.
+# composer.json and package.json move on purpose, never by a bot. laravel/nova
+# resolves to the test double in stubs/nova, so no registry credentials are needed.
 version: 2
-
-registries:
-  nova:
-    type: composer-repository
-    url: https://nova.laravel.com
-    username: ${{secrets.NOVA_USERNAME}}
-    password: ${{secrets.NOVA_LICENSE_KEY}}
 
 updates:
   - package-ecosystem: composer
     directory: /
-    registries: [nova]
     schedule:
       interval: weekly
       day: monday
