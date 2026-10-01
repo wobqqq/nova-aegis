@@ -4,6 +4,8 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-01
+
 Breaking for code that extends the core: every class is now final, and an application that called `new HttpProbe()` (or the TCP / TLS probe) resolves the interface from the container instead. Modules and the settings stored in `aegis_settings` are unaffected.
 
 ### Added
@@ -44,7 +46,8 @@ Breaking for code that extends the core: every class is now final, and an applic
 - The module API (`Aegis::module()`, `Aegis::check()`, `Aegis::settings()`, `SettingsSaved`) for add-on packages.
 - `aegis:check` and `aegis:disable` console commands.
 
-[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/wobqqq/nova-aegis/compare/v1.1.1...v2.0.0
 [1.1.1]: https://github.com/wobqqq/nova-aegis/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/wobqqq/nova-aegis/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/wobqqq/nova-aegis/releases/tag/v1.0.0
