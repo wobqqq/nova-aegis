@@ -29,7 +29,7 @@ make ready          # all of the above
 
 `make ready` must pass. PHPStan runs at `level: max` with strict rules and **no baseline**: fix the type, never add an ignore. Advisories from `composer audit` or `npm audit` are fixed by updating the package, never ignored. `dist/` is committed: rebuild it in the same commit as any change under `resources/js` or `resources/css`.
 
-Installing Nova needs a license: `auth.json` (gitignored and export-ignored) holds the credentials. Never read, print or commit it.
+No Nova license is needed: `laravel/nova` resolves to the test double in `stubs/nova` (see *Tests*). `make test.nova` runs the PHP suite on the real Nova and is the only command that needs a license, read from `auth.json` (gitignored and export-ignored). Never read, print or commit it.
 
 ## How the code is laid out
 
@@ -49,6 +49,7 @@ Installing Nova needs a license: `auth.json` (gitignored and export-ignored) hol
 | `src/Support/Values.php` | Typed reads of untrusted stored values. |
 | `resources/js/`, `resources/css/` | The Vue 3 page, card and components, built by Vite into `dist/`. |
 | `resources/lang/en/aegis.php` | Every label and message, under `aegis::aegis.*`. |
+| `stubs/nova/` | The Nova test double the suite and PHPStan run on (export-ignored). |
 
 ### The contract with the modules (do not break it)
 
@@ -88,7 +89,9 @@ Read the `aegis-security` skill for the full checklist. The non-negotiables:
 
 ## Tests
 
-Pest 4 on Orchestra Testbench 10 with the real `laravel/nova` (SQLite in memory), Vitest 4 with happy-dom for the Vue components. No test reaches the network. Read the `package-testing` skill (PHP) and `nova-component-testing` (JS).
+Pest 4 on Orchestra Testbench 10 (SQLite in memory), Vitest 4 with happy-dom for the Vue components. No test reaches the network. Read the `package-testing` skill (PHP) and `nova-component-testing` (JS).
+
+`laravel/nova` is the test double in `stubs/nova`: a path repository (`"versions": {"laravel/nova": "5.99.0"}`, symlinked) declared in `composer.json`, so `make install`, CI and PHPStan need no license; the `require` stays `laravel/nova: ^5.0`, and applications get the real Nova because a dependency's repositories are ignored. The double is our own minimal code, never Nova's: the same class names and public signatures (native types and PHPDoc) and the behaviour the six Aegis packages rely on — `Nova::path()/url()/router()/serving()/tools()/script()/style()`, `Util::isNovaRequest()`, `Tool`, `Card`, `Menu\MenuSection`, the `nova`, `nova:api`, `nova:auth`, `nova:serving` and `nova:asset` groups, the `nova.auth` and `nova.guest` aliases, the `nova.*` config and a guarded `nova-api/*` catch-all. When a package starts using another Nova API, add it to `stubs/nova` with the real signature (read it in a Nova install) before using it, and check it with `make test.nova` when you have a license. The modules carry a copy of the same `stubs/nova`; keep them in step.
 
 ## Git workflow
 

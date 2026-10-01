@@ -9,7 +9,7 @@ NODE := docker compose run --rm node
 .PHONY: docker.build install update shell \
 	composer.code.fix composer.code.check composer.code.stan composer.test composer.test.coverage composer.test.mutate \
 	npm.install npm.code.fix npm.code.check npm.test npm.test.coverage npm.build \
-	code.fix code.check test test.coverage test.mutate ready
+	code.fix code.check test test.coverage test.mutate test.nova ready
 
 # ─────────────────────────────── Docker ───────────────────────────────
 docker.build:
@@ -72,5 +72,9 @@ test: composer.test npm.test
 test.coverage: composer.test.coverage npm.test.coverage
 
 test.mutate: composer.test.mutate
+
+# Optional: the PHP suite on the real laravel/nova; needs your Nova license in auth.json.
+test.nova:
+	./docker/test-nova.sh
 
 ready: code.fix code.check test.coverage npm.build

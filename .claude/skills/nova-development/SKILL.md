@@ -14,7 +14,7 @@ metadata:
 
 # Nova development (this package)
 
-Aegis is a Nova 5 tool with an Inertia page, plus a dashboard card. Check Nova's own source in `vendor/laravel/nova` for version-specific APIs before using one.
+Aegis is a Nova 5 tool with an Inertia page, plus a dashboard card. `vendor/laravel/nova` here is the test double in `stubs/nova`, not Nova: check a version-specific API in a real Nova install, and add any Nova class or method you start using to `stubs/nova` with its real signature (see `package-testing`).
 
 ## The pieces
 
