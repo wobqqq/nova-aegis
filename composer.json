@@ -47,8 +47,14 @@
     },
     "repositories": {
         "nova": {
-            "type": "composer",
-            "url": "https://nova.laravel.com"
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "laravel/nova": "5.99.0"
+                }
+            },
+            "type": "path",
+            "url": "stubs/nova"
         }
     },
     "autoload": {
@@ -97,7 +103,7 @@
             "@code.cs.fix",
             "@code.rector.fix"
         ],
-        "code.lint": "find src config database routes tests resources -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null",
+        "code.lint": "find src config database routes tests resources stubs -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null",
         "code.rector.check": "rector process --dry-run",
         "code.rector.fix": "rector process",
         "code.stan": "phpstan analyse --memory-limit=1G",

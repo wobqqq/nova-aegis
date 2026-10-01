@@ -36,7 +36,6 @@ jobs:
   ci:
     needs: verify
     uses: ./.github/workflows/ci.yml
-    secrets: inherit
 
   github-release:
     name: GitHub release

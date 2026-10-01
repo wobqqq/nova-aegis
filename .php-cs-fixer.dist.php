@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $finder = PhpCsFixer\Finder::create()
-    ->in([__DIR__ . '/src', __DIR__ . '/config', __DIR__ . '/database', __DIR__ . '/routes', __DIR__ . '/tests', __DIR__ . '/resources/lang'])
+    ->in([__DIR__ . '/src', __DIR__ . '/config', __DIR__ . '/database', __DIR__ . '/routes', __DIR__ . '/tests', __DIR__ . '/resources/lang', __DIR__ . '/stubs'])
     ->append([__DIR__ . '/rector.php', __DIR__ . '/.php-cs-fixer.dist.php']);
 
 return (new PhpCsFixer\Config())
