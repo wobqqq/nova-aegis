@@ -32,4 +32,16 @@ final class Aegis
     {
         return resolve(SettingsRepository::class)->section($section);
     }
+
+    /**
+     * Validates the values with the module's rules and saves them, as the Aegis tool does.
+     *
+     * @param array<string, mixed> $values
+     *
+     * @return array<string, mixed> the values as saved
+     */
+    public static function save(string $section, array $values): array
+    {
+        return resolve(SettingsRepository::class)->save($section, $values);
+    }
 }

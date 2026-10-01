@@ -54,7 +54,8 @@ Installing Nova needs a license: `auth.json` (gitignored and export-ignored) hol
 
 The modules are separate packages that applications update independently, so an application may run a new core with old modules or the other way round. These are **public API**; renaming or changing their shape breaks installed applications:
 
-- `Wobqqq\Aegis\Aegis::module()`, `::check()`, `::settings()`;
+- `Wobqqq\Aegis\Aegis::module()`, `::check()`, `::settings()`, `::save()`;
+- `Wobqqq\Aegis\Support\Values` (reading a typed value from a section with a safe fallback);
 - `Wobqqq\Aegis\Contracts\Module` and `Check` (adding a method to an interface is a breaking change);
 - `Wobqqq\Aegis\Checks\CheckResult` and its factories, `Wobqqq\Aegis\Enums\Status`;
 - `Wobqqq\Aegis\Settings\Field` and its factories, `Wobqqq\Aegis\Enums\FieldType`;

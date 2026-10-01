@@ -4,6 +4,13 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-01
+
+### Added
+
+- `Aegis::save()` for modules that change their settings outside the Aegis tool, such as a recovery command; it validates the values with the module's rules and dispatches `SettingsSaved`.
+- `Wobqqq\Aegis\Support\Values` is part of the public API.
+
 ## [1.0.0] - 2026-10-01
 
 ### Added
@@ -17,5 +24,6 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 - The module API (`Aegis::module()`, `Aegis::check()`, `Aegis::settings()`, `SettingsSaved`) for add-on packages.
 - `aegis:check` and `aegis:disable` console commands.
 
-[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/wobqqq/nova-aegis/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/wobqqq/nova-aegis/releases/tag/v1.0.0

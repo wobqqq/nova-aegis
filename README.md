@@ -148,6 +148,7 @@ public function boot(): void
 
 - `key()` names its settings section (`csp`), `defaults()` and `rules()` define and validate its values, `fields()` draws its form (`Field::toggle()`, `number()`, `text()`, `textarea()`, `select()`, `table()`), and `status()` adds its line to the dashboard.
 - `Aegis::settings('csp')` reads the saved values merged over the defaults, cached.
+- `Aegis::save('csp', $values)` validates the values with the module's rules, stores them and dispatches `SettingsSaved` (for a recovery command, for instance).
 - `Wobqqq\Aegis\Events\SettingsSaved` is dispatched with the section and its values after each save.
 
 ## ⬆️ Upgrading

@@ -130,3 +130,20 @@ it('lets a module add its own section', function (): void {
 
     expect(Aegis::settings('acme-module'))->toBe(['enabled' => true]);
 });
+
+it('saves a section for a module through the public API', function (): void {
+    $dispatched = [];
+    Event::listen(SettingsSaved::class, static function (SettingsSaved $event) use (&$dispatched): void {
+        $dispatched[] = $event->section;
+    });
+
+    $saved = Aegis::save(HardeningModule::KEY, array_replace(Aegis::settings(HardeningModule::KEY), ['enabled' => true, 'password_min_length' => 16]));
+
+    expect($saved)->toMatchArray(['enabled' => true, 'password_min_length' => 16])
+        ->and(Aegis::settings(HardeningModule::KEY))->toMatchArray(['enabled' => true, 'password_min_length' => 16])
+        ->and($dispatched)->toBe([HardeningModule::KEY]);
+});
+
+it('refuses through the public API what the module rules refuse', function (): void {
+    Aegis::save(HardeningModule::KEY, array_replace(Aegis::settings(HardeningModule::KEY), ['password_min_length' => 2]));
+})->throws(ValidationException::class);
