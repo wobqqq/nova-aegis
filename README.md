@@ -66,15 +66,27 @@ Add-on packages register their own settings section, dashboard line and checks:
 
 ## 📥 Installation
 
+### 1. Install the package
+
 ```bash
 composer require wobqqq/nova-aegis
+```
+
+The service provider is discovered automatically.
+
+### 2. Run the migrations
+
+```bash
 php artisan migrate
 ```
 
-Register the tool and, if you want it, the card in `app/Providers/NovaServiceProvider.php`:
+This creates the `aegis_settings` table every Aegis module keeps its settings in.
+
+### 3. Register the tool
+
+In `app/Providers/NovaServiceProvider.php`:
 
 ```php
-use Wobqqq\Aegis\Nova\AegisCard;
 use Wobqqq\Aegis\Nova\AegisTool;
 
 public function tools(): array
@@ -85,8 +97,13 @@ public function tools(): array
 }
 ```
 
+### 4. Add the dashboard card (optional)
+
+In `app/Nova/Dashboards/Main.php`:
+
 ```php
-// app/Nova/Dashboards/Main.php
+use Wobqqq\Aegis\Nova\AegisCard;
+
 public function cards(): array
 {
     return [
@@ -95,7 +112,9 @@ public function cards(): array
 }
 ```
 
-Then say who may open it. Nobody can until the application defines the `viewAegis` gate:
+### 5. Say who may open Aegis
+
+Nobody can until the application defines the `viewAegis` gate, for instance in `app/Providers/AppServiceProvider.php`:
 
 ```php
 use Illuminate\Support\Facades\Gate;
@@ -103,9 +122,11 @@ use Illuminate\Support\Facades\Gate;
 Gate::define('viewAegis', fn ($user) => $user->is_admin);
 ```
 
-`composer audit` runs daily through Laravel's scheduler, so the scheduler must run (`php artisan schedule:run` every minute). Set `AEGIS_AUDIT_SCHEDULE=false` to run `php artisan aegis:audit` yourself.
+### 6. Keep the scheduler running
 
-To change the defaults, publish the config:
+`composer audit` runs daily through Laravel's scheduler, so `php artisan schedule:run` must run every minute. Set `AEGIS_AUDIT_SCHEDULE=false` to run `php artisan aegis:audit` yourself instead.
+
+### 7. Change the defaults (optional)
 
 ```bash
 php artisan vendor:publish --tag=aegis-config
