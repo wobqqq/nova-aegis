@@ -11,10 +11,8 @@ use Wobqqq\Aegis\Enums\Status;
 
 final class CheckCommand extends Command
 {
-    /** @var string */
     protected $signature = 'aegis:check {--strict : Fail on warnings too}';
 
-    /** @var string */
     protected $description = 'Run the Aegis security checks; the exit code is non-zero when one fails.';
 
     public function handle(CheckRunner $runner): int

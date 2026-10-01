@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Audit;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Date;
 use JsonSerializable;
+use Override;
 
 final readonly class AuditResult implements JsonSerializable
 {
     /**
-     * @param list<array{package: string, title: string, cve: string|null, link: string|null}> $advisories
+     * @param list<Advisory> $advisories
      * @param list<string> $abandoned
      */
     public function __construct(
-        public Carbon $ranAt,
+        public CarbonInterface $ranAt,
         public array $advisories,
         public array $abandoned,
         public ?string $error = null,
@@ -23,7 +25,7 @@ final readonly class AuditResult implements JsonSerializable
 
     public static function failed(string $error): self
     {
-        return new self(\Illuminate\Support\Facades\Date::now(), [], [], $error);
+        return new self(Date::now(), [], [], $error);
     }
 
     /**
@@ -35,22 +37,15 @@ final readonly class AuditResult implements JsonSerializable
 
         foreach (is_array($report['advisories'] ?? null) ? $report['advisories'] : [] as $package => $list) {
             foreach (is_array($list) ? $list : [] as $advisory) {
-                if (!is_array($advisory)) {
-                    continue;
+                if (is_array($advisory)) {
+                    $advisories[] = Advisory::fromArray($advisory, (string)$package);
                 }
-
-                $advisories[] = [
-                    'package' => is_string($advisory['packageName'] ?? null) ? $advisory['packageName'] : (string)$package,
-                    'title' => is_string($advisory['title'] ?? null) ? $advisory['title'] : '',
-                    'cve' => is_string($advisory['cve'] ?? null) ? $advisory['cve'] : null,
-                    'link' => is_string($advisory['link'] ?? null) ? $advisory['link'] : null,
-                ];
             }
         }
 
         $abandoned = is_array($report['abandoned'] ?? null) ? array_map(strval(...), array_keys($report['abandoned'])) : [];
 
-        return new self(\Illuminate\Support\Facades\Date::now(), $advisories, array_values($abandoned));
+        return new self(Date::now(), $advisories, array_values($abandoned));
     }
 
     /**
@@ -66,19 +61,14 @@ final readonly class AuditResult implements JsonSerializable
 
         foreach (is_array($data['advisories'] ?? null) ? $data['advisories'] : [] as $advisory) {
             if (is_array($advisory) && is_string($advisory['package'] ?? null)) {
-                $advisories[] = [
-                    'package' => $advisory['package'],
-                    'title' => is_string($advisory['title'] ?? null) ? $advisory['title'] : '',
-                    'cve' => is_string($advisory['cve'] ?? null) ? $advisory['cve'] : null,
-                    'link' => is_string($advisory['link'] ?? null) ? $advisory['link'] : null,
-                ];
+                $advisories[] = Advisory::fromArray($advisory);
             }
         }
 
         $abandoned = array_values(array_filter(is_array($data['abandoned'] ?? null) ? $data['abandoned'] : [], is_string(...)));
 
         return new self(
-            \Illuminate\Support\Facades\Date::parse($data['ran_at']),
+            Date::parse($data['ran_at']),
             $advisories,
             $abandoned,
             is_string($data['error'] ?? null) ? $data['error'] : null,
@@ -86,13 +76,22 @@ final readonly class AuditResult implements JsonSerializable
     }
 
     /**
+     * @return list<string>
+     */
+    public function packages(): array
+    {
+        return array_values(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->package, $this->advisories)));
+    }
+
+    /**
      * @return array{ran_at: string, advisories: list<array{package: string, title: string, cve: string|null, link: string|null}>, abandoned: list<string>, error: string|null}
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
             'ran_at' => $this->ranAt->toIso8601String(),
-            'advisories' => $this->advisories,
+            'advisories' => array_map(static fn (Advisory $advisory): array => $advisory->jsonSerialize(), $this->advisories),
             'abandoned' => $this->abandoned,
             'error' => $this->error,
         ];

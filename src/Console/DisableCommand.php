@@ -10,10 +10,8 @@ use Wobqqq\Aegis\Settings\SettingsRepository;
 
 final class DisableCommand extends Command
 {
-    /** @var string */
     protected $signature = 'aegis:disable';
 
-    /** @var string */
     protected $description = 'Turn the Aegis hardening off, for an administrator it locked out.';
 
     public function handle(SettingsRepository $settings): int

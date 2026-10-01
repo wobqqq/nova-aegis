@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Settings;
 
 use JsonSerializable;
+use Override;
 use Wobqqq\Aegis\Enums\FieldType;
 
 /**
@@ -68,6 +69,7 @@ final readonly class Field implements JsonSerializable
     /**
      * @return array<string, mixed>
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return array_filter([

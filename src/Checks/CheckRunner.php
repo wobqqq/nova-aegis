@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Wobqqq\Aegis\Modules\ModuleRegistry;
 use Wobqqq\Aegis\Settings\SettingsRepository;
+use Wobqqq\Aegis\Support\Lang;
 
 final readonly class CheckRunner
 {
@@ -31,7 +32,7 @@ final readonly class CheckRunner
                 $results[] = $check->run();
             } catch (Throwable $e) {
                 $this->logger->error('An Aegis check failed.', ['check' => $check::class, 'exception' => $e::class]);
-                $results[] = CheckResult::fail(class_basename($check), class_basename($check), (string)__('aegis::aegis.checks.failed'));
+                $results[] = CheckResult::fail(class_basename($check), class_basename($check), Lang::get('aegis::aegis.checks.failed'));
             }
         }
 

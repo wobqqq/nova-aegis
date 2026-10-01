@@ -9,7 +9,7 @@ use Throwable;
 
 final readonly class AuditStore
 {
-    private const KEY = 'aegis.audit.v1';
+    private const string KEY = 'aegis.audit.v1';
 
     public function __construct(private Cache $cache)
     {

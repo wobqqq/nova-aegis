@@ -8,7 +8,7 @@ license: MIT
 
 ## The harness
 
-- Pest 4 on Orchestra Testbench 10 (Laravel 12) with `laravel/nova` resolved to the test double in `stubs/nova` (see below). SQLite in memory, array cache and session (`phpunit.xml.dist`, `APP_URL=https://aegis.test`).
+- Pest 5 on Orchestra Testbench 11 (Laravel 13; CI also on Laravel 12 and PHP 8.5) with `laravel/nova` resolved to the test double in `stubs/nova` (see below). SQLite in memory, array cache and session (`phpunit.xml.dist`, `APP_URL=https://aegis.test`).
 - `tests/TestCase.php` loads `Inertia\ServiceProvider`, `NovaCoreServiceProvider` and `AegisServiceProvider`, creates the `users` table for `tests/Fixtures/User.php`, registers `AegisTool` with Nova and defines `viewAegis` as `is_admin`.
 - `tests/Pest.php` gives two global helpers: `admin()` (allowed by the gate) and `editor()` (refused).
 - `Feature/` exercises the package through the container, HTTP, the console and Nova; `Unit/ArchitectureTest.php` holds the `arch()` rules: strict types, no debugging calls, immutable value objects, enums for shared codes, network connections only in `Scanners`.
@@ -28,9 +28,9 @@ license: MIT
 - Test what an administrator or the application sees: the config Laravel ends up with, the JSON the API answers, the status a check reports, the exit code of a command. Not private methods.
 - A security rule is a test: a refused user, an unlisted scan target, an invalid setting, a check that throws.
 - No test reaches the network:
-  - HTTP goes through a Guzzle `MockHandler` given to `HttpProbe`;
+  - HTTP goes through a Guzzle `MockHandler` given to `GuzzleHttpProbe`;
   - TCP through local sockets (`tests/Support/Sockets.php`);
-  - TLS and the scanner endpoints through probes replaced in the container (`app()->instance(TlsProbe::class, ...)`);
+  - TLS and the scanner endpoints through an anonymous implementation of the probe interface bound in the container (`app()->instance(TlsProbe::class, new class () implements TlsProbe { ... })`);
   - `composer audit` through `Process::fake()`.
 - A setting is saved through `SettingsRepository::save()` (or the API), never written to the table by hand, unless the test is about a stored row the rules would refuse.
 - Coverage stays at 90 % or more (`make test.coverage`).

@@ -17,9 +17,9 @@ final class SettingsRepository
     /**
      * Part of the cache key: a release that changes what is cached bumps it.
      */
-    private const CACHE_VERSION = 1;
+    private const int CACHE_VERSION = 1;
 
-    private const TTL = 3600;
+    private const int TTL = 3600;
 
     /** @var array<string, array<string, mixed>>|null */
     private ?array $stored = null;

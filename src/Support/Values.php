@@ -84,9 +84,9 @@ final class Values
             }
 
             $target = is_scalar($row[$targetColumn] ?? null) ? trim((string)$row[$targetColumn]) : '';
-            $ports = is_scalar($row['ports'] ?? null) ? explode(',', (string)$row['ports']) : [];
+            $parts = is_scalar($row['ports'] ?? null) ? explode(',', (string)$row['ports']) : [];
             $ports = array_values(array_unique(array_filter(
-                array_map(static fn (string $port): int => (int)trim($port), $ports),
+                array_map(static fn (string $port): int => (int)trim($port), $parts),
                 static fn (int $port): bool => $port > 0 && $port <= 65535,
             )));
 

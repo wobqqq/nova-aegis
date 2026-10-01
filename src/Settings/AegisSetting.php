@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Settings;
 
 use Illuminate\Database\Eloquent\Model;
+use Override;
 
 /**
  * @property int $id
@@ -18,6 +19,7 @@ final class AegisSetting extends Model
     /** @var list<string> */
     protected $fillable = ['section', 'values'];
 
+    #[Override]
     protected function casts(): array
     {
         return ['values' => 'array'];

@@ -2,17 +2,21 @@
 
 declare(strict_types=1);
 
-$finder = PhpCsFixer\Finder::create()
-    ->in([__DIR__ . '/src', __DIR__ . '/config', __DIR__ . '/database', __DIR__ . '/routes', __DIR__ . '/tests', __DIR__ . '/resources/lang', __DIR__ . '/stubs'])
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
+
+$finder = Finder::create()
+    ->in([__DIR__ . '/src', __DIR__ . '/config', __DIR__ . '/database', __DIR__ . '/routes', __DIR__ . '/tests', __DIR__ . '/resources/lang'])
     ->append([__DIR__ . '/rector.php', __DIR__ . '/.php-cs-fixer.dist.php']);
 
-return (new PhpCsFixer\Config())
+return new Config()
     ->setFinder($finder)
     ->setRiskyAllowed(true)
     ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache')
     ->setRules([
         '@PSR12' => true,
-        '@PHP8x2Migration' => true,
+        '@PHP8x4Migration' => true,
+        '@PHP8x4Migration:risky' => true,
         'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => true,
         'blank_line_after_opening_tag' => true,
@@ -23,7 +27,8 @@ return (new PhpCsFixer\Config())
         'combine_consecutive_unsets' => true,
         'concat_space' => ['spacing' => 'one'],
         'declare_strict_types' => true,
-        'fully_qualified_strict_types' => true,
+        'final_class' => true,
+        'fully_qualified_strict_types' => ['import_symbols' => true],
         'global_namespace_import' => ['import_classes' => true, 'import_constants' => false, 'import_functions' => false],
         'lowercase_cast' => true,
         'method_argument_space' => true,
@@ -36,7 +41,8 @@ return (new PhpCsFixer\Config())
         'no_extra_blank_lines' => true,
         'no_leading_import_slash' => true,
         'no_superfluous_elseif' => true,
-        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true, 'remove_inheritdoc' => true],
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => false, 'allow_unused_params' => false, 'remove_inheritdoc' => true],
+        'nullable_type_declaration_for_default_null_value' => true,
         'no_unused_imports' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
@@ -47,18 +53,25 @@ return (new PhpCsFixer\Config())
         'phpdoc_order' => true,
         'phpdoc_scalar' => true,
         'phpdoc_separation' => true,
+        'phpdoc_to_param_type' => true,
+        'phpdoc_to_return_type' => true,
         'phpdoc_trim' => true,
         'phpdoc_types_order' => ['null_adjustment' => 'always_last'],
         'return_type_declaration' => true,
         'short_scalar_cast' => true,
         'single_line_comment_style' => true,
         'single_quote' => true,
+        'self_accessor' => true,
         'single_trait_insert_per_statement' => true,
+        'strict_comparison' => true,
+        'strict_param' => true,
         'space_after_semicolon' => true,
         'ternary_operator_spaces' => true,
         'trailing_comma_in_multiline' => true,
         'trim_array_spaces' => true,
         'types_spaces' => true,
         'unary_operator_spaces' => true,
+        'use_arrow_functions' => true,
+        'void_return' => true,
         'whitespace_after_comma_in_array' => true,
     ]);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Checks;
 
 use JsonSerializable;
+use Override;
 use Wobqqq\Aegis\Enums\Status;
 
 final readonly class CheckResult implements JsonSerializable
@@ -40,6 +41,7 @@ final readonly class CheckResult implements JsonSerializable
     /**
      * @return array{key: string, label: string, status: string, message: string}
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

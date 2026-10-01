@@ -4,7 +4,7 @@ Guidance for AI coding agents (Claude Code, Codex, Junie, Cursor) working in thi
 
 ## What this is
 
-**Aegis** (`wobqqq/nova-aegis`) is the core of a security suite for Laravel Nova (Laravel 12, PHP 8.2+). It:
+**Aegis** (`wobqqq/nova-aegis`) is the core of a security suite for Laravel Nova (Laravel 12 or 13, PHP 8.4+). It:
 
 - hardens the application at boot (`HardeningService::apply()`: session cookies, `Password::defaults()`, forced HTTPS; the `TransportSecurity` middleware for the HTTPS redirect and HSTS) from the **Aegis → Settings** tab;
 - runs the security checks (`Checks/Core`), `composer audit` (`Audit/`) and three scanners (`Scanners/`: sensitive files over HTTP, open TCP ports, TLS certificates);
@@ -20,14 +20,14 @@ Everything runs in Docker; the host needs no PHP or Node.
 ```bash
 make install        # composer install + npm ci
 make code.fix       # composer normalize, Rector, PHP CS Fixer, ESLint, Prettier
-make code.check     # validate, normalize --dry-run, composer audit, php -l, cs, Rector, PHPStan max, ESLint, Prettier, npm audit
+make code.check     # validate, normalize --dry-run, composer audit, php -l, cs, Rector, PHPStan max (bleeding edge, strict, shipmonk), ESLint, Prettier, npm audit
 make test           # Pest + Vitest
 make test.coverage  # both with coverage, failing below 90 %
 make npm.build      # dist/js/tool.js and dist/css/tool.css
 make ready          # all of the above
 ```
 
-`make ready` must pass. PHPStan runs at `level: max` with strict rules and **no baseline**: fix the type, never add an ignore. Advisories from `composer audit` or `npm audit` are fixed by updating the package, never ignored. `dist/` is committed: rebuild it in the same commit as any change under `resources/js` or `resources/css`.
+`make ready` must pass. PHPStan runs at `level: max` on bleeding edge with the strict, deprecation and shipmonk rules and **no baseline**: fix the type, never add an ignore (the one exception in `phpstan.neon.dist` is Pest's `@internal` expectation API in `tests/`). Advisories from `composer audit` or `npm audit` are fixed by updating the package, never ignored. `dist/` is committed: rebuild it in the same commit as any change under `resources/js` or `resources/css`.
 
 No Nova license is needed: `laravel/nova` resolves to the test double in `stubs/nova` (see *Tests*). `make test.nova` runs the PHP suite on the real Nova and is the only command that needs a license, read from `auth.json` (gitignored and export-ignored). Never read, print or commit it.
 
@@ -89,7 +89,7 @@ Read the `aegis-security` skill for the full checklist. The non-negotiables:
 
 ## Tests
 
-Pest 4 on Orchestra Testbench 10 (SQLite in memory), Vitest 4 with happy-dom for the Vue components. No test reaches the network. Read the `package-testing` skill (PHP) and `nova-component-testing` (JS).
+Pest 5 on Orchestra Testbench 11 (SQLite in memory; CI also runs the suite on Laravel 12 and on PHP 8.5), Vitest 4 with happy-dom for the Vue components. No test reaches the network. Read the `package-testing` skill (PHP) and `nova-component-testing` (JS).
 
 `laravel/nova` is the test double in `stubs/nova`: a path repository (`"versions": {"laravel/nova": "5.99.0"}`, symlinked) declared in `composer.json`, so `make install`, CI and PHPStan need no license; the `require` stays `laravel/nova: ^5.0`, and applications get the real Nova because a dependency's repositories are ignored. The double is our own minimal code, never Nova's: the same class names and public signatures (native types and PHPDoc) and the behaviour the six Aegis packages rely on — `Nova::path()/url()/router()/serving()/tools()/script()/style()`, `Util::isNovaRequest()`, `Tool`, `Card`, `Menu\MenuSection`, the `nova`, `nova:api`, `nova:auth`, `nova:serving` and `nova:asset` groups, the `nova.auth` and `nova.guest` aliases, the `nova.*` config and a guarded `nova-api/*` catch-all. When a package starts using another Nova API, add it to `stubs/nova` with the real signature (read it in a Nova install) before using it, and check it with `make test.nova` when you have a license. The modules carry a copy of the same `stubs/nova`; keep them in step.
 
@@ -106,7 +106,8 @@ Pest 4 on Orchestra Testbench 10 (SQLite in memory), Vitest 4 with happy-dom for
 ## Conventions
 
 - `declare(strict_types=1);` in every PHP file; PSR-12 via PHP CS Fixer.
+- Native types first: typed constants, parameters, returns and properties, `#[\Override]` on every overriding method. PHPDoc only for what PHP cannot express (`list<Field>`, array shapes, generics); a tag that repeats a native type is removed.
+- Classes are `final` (the Nova `Tool`/`Card` subclasses included); value objects are `final readonly`. A test double implements an interface (`HttpProbe`, `TcpProbe`, `TlsProbe`) instead of extending a class.
 - Code documents itself: names over comments. A comment explains a non-obvious *why*, in one sentence.
-- Value objects are `final readonly`; services are `final` unless a test double has to extend them (the probes).
 - Laravel and Nova patterns: container bindings, `Process`, `Http`/Guzzle, `Cache`, Nova's `Tool`/`Card`, `Nova.request()` on the page.
 - Commits: imperative subject saying what the change does for the application ("Redirect plain HTTP when HTTPS is forced"), a body with the why.

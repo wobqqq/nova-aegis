@@ -5,11 +5,14 @@ declare(strict_types=1);
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Process;
 use Wobqqq\Aegis\Hardening\HardeningModule;
+use Wobqqq\Aegis\Scanners\Certificate;
 use Wobqqq\Aegis\Scanners\HttpProbe;
+use Wobqqq\Aegis\Scanners\Probes\GuzzleHttpProbe;
 use Wobqqq\Aegis\Scanners\ScannersModule;
 use Wobqqq\Aegis\Scanners\TlsProbe;
 use Wobqqq\Aegis\Settings\SettingsRepository;
@@ -60,7 +63,7 @@ it('describes every section with its fields and values', function (): void {
 });
 
 it('saves a section and answers the errors of an invalid one', function (): void {
-    $values = ['enabled' => true] + (new HardeningModule())->defaults();
+    $values = ['enabled' => true] + new HardeningModule()->defaults();
 
     actingAs($admin = admin())->putJson('/nova-vendor/aegis/settings/hardening', ['values' => $values])
         ->assertOk()->assertJsonPath('values.enabled', true);
@@ -72,11 +75,12 @@ it('saves a section and answers the errors of an invalid one', function (): void
 });
 
 it('runs a scan against a listed target and refuses the others', function (): void {
-    app()->instance(HttpProbe::class, new HttpProbe(new Client(['handler' => HandlerStack::create(
-        static fn (): GuzzleHttp\Promise\PromiseInterface => Create::promiseFor(new Response(200)),
+    app()->instance(HttpProbe::class, new GuzzleHttpProbe(new Client(['handler' => HandlerStack::create(
+        static fn (): PromiseInterface => Create::promiseFor(new Response(200)),
     )])));
-    app()->instance(TlsProbe::class, new class () extends TlsProbe {
-        public function certificate(string $host, int $port): ?array
+    app()->instance(TlsProbe::class, new class () implements TlsProbe {
+        #[Override]
+        public function certificate(string $host, int $port): ?Certificate
         {
             return null;
         }

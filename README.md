@@ -3,7 +3,7 @@
 [![CI](https://github.com/wobqqq/nova-aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/wobqqq/nova-aegis/actions/workflows/ci.yml)
 [![Packagist](https://img.shields.io/packagist/v/wobqqq/nova-aegis)](https://packagist.org/packages/wobqqq/nova-aegis)
 [![Downloads](https://img.shields.io/packagist/dt/wobqqq/nova-aegis)](https://packagist.org/packages/wobqqq/nova-aegis)
-[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)](https://github.com/wobqqq/nova-aegis/blob/main/composer.json)
+[![PHP](https://img.shields.io/badge/PHP-8.4%2B-777bb4)](https://github.com/wobqqq/nova-aegis/blob/main/composer.json)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%20max-brightgreen)](https://github.com/wobqqq/nova-aegis/blob/main/phpstan.neon.dist)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/wobqqq/nova-aegis/blob/main/LICENSE.md)
 
@@ -60,8 +60,8 @@ Add-on packages register their own settings section, dashboard line and checks:
 
 ## 📦 Requirements
 
-- PHP 8.2 or higher
-- Laravel 12
+- PHP 8.4 or higher
+- Laravel 12 or 13
 - Laravel Nova 5
 
 ## 📥 Installation
