@@ -27,7 +27,7 @@
         "security": "https://github.com/wobqqq/nova-aegis/security/policy"
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "laravel/framework": "^12.0 || ^13.0",
         "laravel/nova": "^5.0"
     },
@@ -43,7 +43,8 @@
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
-        "rector/rector": "^2.2"
+        "rector/rector": "^2.2",
+        "shipmonk/phpstan-rules": "^4.4"
     },
     "repositories": {
         "nova": {

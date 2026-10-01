@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c9b9239eee6a42961513442f0a621da",
+    "content-hash": "9787316f0459f036bda9c7bbea66d096",
     "packages": [
         {
             "name": "brick/math",
@@ -1367,12 +1367,12 @@
             "dist": {
                 "type": "path",
                 "url": "stubs/nova",
-                "reference": "b1d89151704652b2b0ca629fd909d1a3d00b4b62"
+                "reference": "02ab8a231418cc73943103e1ab313c756fe95ab1"
             },
             "require": {
                 "illuminate/support": "^12.0 || ^13.0",
                 "inertiajs/inertia-laravel": "^2.0|^3.0",
-                "php": "^8.2"
+                "php": "^8.4"
             },
             "type": "library",
             "extra": {
@@ -11887,6 +11887,66 @@
             "time": "2026-02-06T04:52:52+00:00"
         },
         {
+            "name": "shipmonk/phpstan-rules",
+            "version": "4.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/shipmonk-rnd/phpstan-rules.git",
+                "reference": "67e54e4338910502d56ca079f1037708d34658a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/shipmonk-rnd/phpstan-rules/zipball/67e54e4338910502d56ca079f1037708d34658a7",
+                "reference": "67e54e4338910502d56ca079f1037708d34658a7",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "phpstan/phpstan": "^2.1.33"
+            },
+            "require-dev": {
+                "editorconfig-checker/editorconfig-checker": "^10.6.0",
+                "ergebnis/composer-normalize": "^2.45.0",
+                "phpstan/phpstan-deprecation-rules": "^2.0.1",
+                "phpstan/phpstan-phpunit": "^2.0.4",
+                "phpstan/phpstan-strict-rules": "^2.0.3",
+                "phpunit/phpunit": "^10.5.46",
+                "shipmonk/coding-standard": "^0.3.0",
+                "shipmonk/composer-dependency-analyser": "^1.8.1",
+                "shipmonk/coverage-guard": "^1.1.0",
+                "shipmonk/dead-code-detector": "^1.0",
+                "shipmonk/name-collision-detector": "^2.1.1",
+                "shipmonk/phpstan-dev": "^0.1.5"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "rules.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ShipMonk\\PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Various extra strict PHPStan rules we found useful in ShipMonk.",
+            "keywords": [
+                "PHPStan",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/shipmonk-rnd/phpstan-rules/issues",
+                "source": "https://github.com/shipmonk-rnd/phpstan-rules/tree/4.4.1"
+            },
+            "time": "2026-10-01T13:39:05+00:00"
+        },
+        {
             "name": "staabm/side-effects-detector",
             "version": "1.0.5",
             "source": {
@@ -12624,7 +12684,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2"
+        "php": "^8.4"
     },
     "platform-dev": {},
     "platform-overrides": {
