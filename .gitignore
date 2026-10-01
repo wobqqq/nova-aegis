@@ -1,0 +1,11 @@
+/vendor/
+/node_modules/
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/coverage/
+/.idea/
+/.vscode/
+/auth.json
+/.claude/settings.local.json
+/.claude/scheduled_tasks.lock
+.DS_Store

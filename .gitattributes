@@ -1,0 +1,34 @@
+* text=auto eol=lf
+
+*.php diff=php
+*.md diff=markdown
+
+# Development only: not shipped to the applications that install the package.
+/.claude export-ignore
+/.github export-ignore
+/docker export-ignore
+/tests export-ignore
+/resources/js export-ignore
+/resources/css export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/.prettierignore export-ignore
+/.prettierrc.json export-ignore
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore
+/composer.lock export-ignore
+/docker-compose.yaml export-ignore
+/eslint.config.js export-ignore
+/Makefile export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore
+/phpstan.neon.dist export-ignore
+/phpunit.xml.dist export-ignore
+/rector.php export-ignore
+/vite.config.js export-ignore
+/vitest.config.js export-ignore
+/auth.json export-ignore
+
+/dist/** -diff linguist-generated

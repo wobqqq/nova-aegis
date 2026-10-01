@@ -1,0 +1,113 @@
+{
+    "name": "wobqqq/nova-aegis",
+    "description": "Security suite for Laravel Nova: hardening, security checks and scanners, with add-on modules",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "laravel-nova",
+        "nova",
+        "nova-tool",
+        "security",
+        "hardening",
+        "vulnerability-scanner",
+        "security-audit"
+    ],
+    "authors": [
+        {
+            "name": "Sergey Zakharevich",
+            "homepage": "https://github.com/wobqqq"
+        }
+    ],
+    "homepage": "https://github.com/wobqqq/nova-aegis",
+    "support": {
+        "issues": "https://github.com/wobqqq/nova-aegis/issues",
+        "source": "https://github.com/wobqqq/nova-aegis",
+        "docs": "https://github.com/wobqqq/nova-aegis#readme",
+        "security": "https://github.com/wobqqq/nova-aegis/security/policy"
+    },
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "laravel/nova": "^5.0"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "^2.0",
+        "ergebnis/composer-normalize": "^2.48",
+        "friendsofphp/php-cs-fixer": "^3.88",
+        "larastan/larastan": "^3.7",
+        "orchestra/testbench": "^10.6",
+        "pestphp/pest": "^4.1",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "rector/rector": "^2.2"
+    },
+    "repositories": {
+        "nova": {
+            "type": "composer",
+            "url": "https://nova.laravel.com"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Wobqqq\\Aegis\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Wobqqq\\Aegis\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
+        },
+        "platform": {
+            "php": "8.4.99"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Wobqqq\\Aegis\\AegisServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "code.check": [
+            "@composer validate --strict",
+            "@composer normalize --dry-run",
+            "@composer audit --abandoned=report",
+            "@code.lint",
+            "@code.cs.check",
+            "@code.rector.check",
+            "@code.stan"
+        ],
+        "code.cs.check": "php-cs-fixer fix --diff --dry-run",
+        "code.cs.fix": "php-cs-fixer fix --diff",
+        "code.fix": [
+            "@composer normalize --no-update-lock",
+            "@code.cs.fix",
+            "@code.rector.fix"
+        ],
+        "code.lint": "find src config database routes tests resources -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null",
+        "code.rector.check": "rector process --dry-run",
+        "code.rector.fix": "rector process",
+        "code.stan": "phpstan analyse --memory-limit=1G",
+        "ready": [
+            "@code.fix",
+            "@code.check",
+            "@test.coverage"
+        ],
+        "test": "pest",
+        "test.coverage": "@php -d pcov.enabled=1 -d pcov.directory=src vendor/bin/pest --coverage --min=90",
+        "test.mutate": "@php -d pcov.enabled=1 -d pcov.directory=src vendor/bin/pest --mutate --parallel --min=70"
+    }
+}

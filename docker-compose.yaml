@@ -1,0 +1,20 @@
+services:
+    php:
+        build: docker/php
+        image: wobqqq/oc-php:8.4
+        user: '${UID:-1000}:${GID:-1000}'
+        working_dir: /app
+        volumes:
+            - .:/app
+            - composer-cache:/tmp/composer
+    node:
+        image: node:22-alpine
+        user: '${UID:-1000}:${GID:-1000}'
+        working_dir: /app
+        environment:
+            npm_config_cache: /tmp/npm
+        volumes:
+            - .:/app
+
+volumes:
+    composer-cache:

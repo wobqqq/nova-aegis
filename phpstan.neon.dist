@@ -1,0 +1,19 @@
+parameters:
+    level: max
+    phpVersion:
+        min: 80200
+        max: 80499
+    paths:
+        - src
+        - config
+        - database
+        - routes
+        - tests
+    excludePaths:
+        # Pest's arch() DSL is declarative configuration that PHPStan cannot type.
+        - tests/Unit/ArchitectureTest.php
+    # The package's config/aegis.php is configuration too; the rule assumes an application layout.
+    noEnvCallsOutsideOfConfig: false
+    strictRules:
+        dynamicCallOnStaticMethod: false
+    treatPhpDocTypesAsCertain: false
