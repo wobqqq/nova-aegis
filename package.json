@@ -1,0 +1,33 @@
+{
+    "name": "nova-aegis",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "watch": "vite build --watch",
+        "test": "vitest run",
+        "test.coverage": "vitest run --coverage",
+        "code.eslint.fix": "eslint . --fix",
+        "code.eslint.check": "eslint . --max-warnings 0",
+        "code.format.fix": "prettier --write . --ignore-unknown",
+        "code.format.check": "prettier --check . --ignore-unknown",
+        "code.audit": "npm audit --audit-level=moderate",
+        "code.fix": "npm run code.eslint.fix && npm run code.format.fix",
+        "code.check": "npm run code.eslint.check && npm run code.format.check && npm run code.audit"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.18.0",
+        "@vitejs/plugin-vue": "^6.0.0",
+        "@vitest/coverage-v8": "^4.1.11",
+        "@vue/test-utils": "^2.4.11",
+        "eslint": "^9.18.0",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-vue": "^9.32.0",
+        "globals": "^15.14.0",
+        "happy-dom": "^20.10.6",
+        "prettier": "^3.4.2",
+        "vite": "^7.0.7",
+        "vitest": "^4.1.11",
+        "vue": "^3.5.38"
+    }
+}
