@@ -9,13 +9,16 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Nova\Nova;
 use Override;
+use Psr\Clock\ClockInterface;
 use Throwable;
 use Wobqqq\Aegis\Audit\AuditStore;
+use Wobqqq\Aegis\Audit\ComposerAudit;
 use Wobqqq\Aegis\Checks\CheckRegistry;
 use Wobqqq\Aegis\Checks\Core;
 use Wobqqq\Aegis\Console\AuditCommand;
@@ -36,6 +39,7 @@ use Wobqqq\Aegis\Scanners\TcpProbe;
 use Wobqqq\Aegis\Scanners\TlsProbe;
 use Wobqqq\Aegis\Settings\AegisSetting;
 use Wobqqq\Aegis\Settings\SettingsRepository;
+use Wobqqq\Aegis\Support\SystemClock;
 
 final class AegisServiceProvider extends ServiceProvider
 {
@@ -54,6 +58,15 @@ final class AegisServiceProvider extends ServiceProvider
             $app->make('events'),
         ));
         $this->app->singleton(AuditStore::class, static fn (Application $app): AuditStore => new AuditStore(self::cache($app)));
+        $this->app->bindIf(ClockInterface::class, SystemClock::class);
+        $this->app->bind(ComposerAudit::class, static fn (Application $app): ComposerAudit => new ComposerAudit(
+            $app->make(ProcessFactory::class),
+            $app->make(AuditStore::class),
+            $app->make(ClockInterface::class),
+            self::string($app, 'aegis.audit.binary', 'composer'),
+            self::integer($app, 'aegis.audit.timeout', 120),
+            $app->basePath(),
+        ));
         $this->app->bind(HttpProbe::class, static fn (Application $app): HttpProbe => new GuzzleHttpProbe(
             timeout: self::integer($app, 'aegis.scanners.http_timeout', 10),
             concurrency:
@@ -134,6 +147,13 @@ final class AegisServiceProvider extends ServiceProvider
         $store = $app->make(Config::class)->get('aegis.cache_store');
 
         return $app->make(CacheFactory::class)->store(is_string($store) && $store !== '' ? $store : null);
+    }
+
+    private static function string(Application $app, string $key, string $default): string
+    {
+        $value = $app->make(Config::class)->get($key);
+
+        return is_string($value) && $value !== '' ? $value : $default;
     }
 
     private static function integer(Application $app, string $key, int $default): int

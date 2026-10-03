@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Checks\Core;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Date;
 use Override;
+use Psr\Clock\ClockInterface;
 use Wobqqq\Aegis\Checks\CheckResult;
 use Wobqqq\Aegis\Contracts\Check;
 use Wobqqq\Aegis\Support\Lang;
 
 final readonly class StaleAdminsCheck implements Check
 {
-    public function __construct(private Config $config)
+    public function __construct(private Config $config, private ClockInterface $clock)
     {
     }
 
@@ -32,8 +33,9 @@ final readonly class StaleAdminsCheck implements Check
             return CheckResult::info('stale_admins', $label, Lang::get('aegis::aegis.checks.stale_admins.unconfigured'));
         }
 
+        $since = CarbonImmutable::instance($this->clock->now())->subDays($days);
         $stale = $model::query()
-            ->where(static fn (Builder $query) => $query->whereNull($column)->orWhere($column, '<', Date::now()->subDays($days)))
+            ->where(static fn (Builder $query) => $query->whereNull($column)->orWhere($column, '<', $since))
             ->count();
 
         return $stale === 0
