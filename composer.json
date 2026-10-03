@@ -29,7 +29,8 @@
     "require": {
         "php": "^8.4",
         "laravel/framework": "^12.0 || ^13.0",
-        "laravel/nova": "^5.0"
+        "laravel/nova": "^5.0",
+        "psr/clock": "^1.0"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.0",

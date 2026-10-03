@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
@@ -158,3 +159,29 @@ it('saves a section for a module through the public API', function (): void {
 it('refuses through the public API what the module rules refuse', function (): void {
     Aegis::save(HardeningModule::KEY, array_replace(Aegis::settings(HardeningModule::KEY), ['password_min_length' => 2]));
 })->throws(ValidationException::class);
+
+it('tells the listeners only once the application commits its transaction', function (): void {
+    $dispatched = [];
+    Event::listen(SettingsSaved::class, static function (SettingsSaved $event) use (&$dispatched): void {
+        $dispatched[] = $event->section;
+    });
+
+    DB::transaction(static function () use (&$dispatched): void {
+        settings()->save(HardeningModule::KEY, new HardeningModule()->defaults());
+
+        expect($dispatched)->toBe([]);
+    });
+
+    expect($dispatched)->toBe([HardeningModule::KEY]);
+
+    try {
+        DB::transaction(static function (): never {
+            settings()->save(HardeningModule::KEY, new HardeningModule()->defaults());
+
+            throw new RuntimeException('rolled back');
+        });
+    } catch (RuntimeException) {
+    }
+
+    expect($dispatched)->toBe([HardeningModule::KEY]);
+});

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Checks\Core;
 
-use Illuminate\Support\Facades\Date;
+use Carbon\CarbonImmutable;
 use Override;
+use Psr\Clock\ClockInterface;
 use Wobqqq\Aegis\Audit\AuditResult;
 use Wobqqq\Aegis\Audit\AuditStore;
 use Wobqqq\Aegis\Checks\CheckResult;
@@ -16,7 +17,7 @@ final readonly class DependencyAdvisoriesCheck implements Check
 {
     private const int STALE_AFTER_DAYS = 7;
 
-    public function __construct(private AuditStore $store)
+    public function __construct(private AuditStore $store, private ClockInterface $clock)
     {
     }
 
@@ -41,7 +42,7 @@ final readonly class DependencyAdvisoriesCheck implements Check
             ]));
         }
 
-        if ($result->ranAt->lt(Date::now()->subDays(self::STALE_AFTER_DAYS))) {
+        if ($result->ranAt->lt(CarbonImmutable::instance($this->clock->now())->subDays(self::STALE_AFTER_DAYS))) {
             return CheckResult::warn('advisories', $label, Lang::get('aegis::aegis.checks.advisories.stale', ['date' => $result->ranAt->toDateString()]));
         }
 

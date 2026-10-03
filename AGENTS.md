@@ -43,10 +43,12 @@ No Nova license is needed: `laravel/nova` resolves to the test double in `stubs/
 | `src/Checks/` | `CheckResult`, the registry, the runner (isolates a failing check), the core checks. |
 | `src/Hardening/` | The `hardening` section, its typed settings and the service that applies them. |
 | `src/Scanners/` | The `scanners` section, `Scanner` (only listed targets) and the probes, the only code that opens network connections. |
-| `src/Audit/` | `composer audit` through `Process`, its result cached forever. |
-| `src/Http/` | The tool's API controllers and middleware (`Authorize`, `TransportSecurity`). |
+| `src/Audit/` | `composer audit` through the injected process factory, its result cached forever. |
+| `src/Http/` | The tool's API controllers, their form requests and the middleware (`Authorize`, `TransportSecurity`). |
+| `src/Exceptions/` | `AegisException` and the refusals that extend it. |
 | `src/Nova/` | `AegisTool` and `AegisCard`. |
 | `src/Support/Values.php` | Typed reads of untrusted stored values. |
+| `src/Support/SystemClock.php` | The default `ClockInterface`, the application's clock. |
 | `resources/js/`, `resources/css/` | The Vue 3 page, card and components, built by Vite into `dist/`. |
 | `resources/lang/en/aegis.php` | Every label and message, under `aegis::aegis.*`. |
 | `stubs/nova/` | The Nova test double the suite and PHPStan run on (export-ignored). |
@@ -61,10 +63,25 @@ The modules are separate packages that applications update independently, so an 
 - `Wobqqq\Aegis\Checks\CheckResult` and its factories, `Wobqqq\Aegis\Enums\Status`;
 - `Wobqqq\Aegis\Settings\Field` and its factories, `Wobqqq\Aegis\Enums\FieldType`;
 - `Wobqqq\Aegis\Events\SettingsSaved` and its properties;
+- `Wobqqq\Aegis\Exceptions\AegisException` (its constructor, `status()` and `render()`), for modules that require a core release that has it;
 - the `aegis_settings` table and the section keys `hardening` and `scanners`;
 - the `viewAegis` gate, the `nova-vendor/aegis` routes, the `aegis-card` component name.
 
 Add to these; do not rename or remove. A module must keep working with every released core version of the same major.
+
+## Architecture
+
+The architecture skills in `.claude/skills/` are the rules for how code is shaped; read the one that matches the change before writing it:
+
+- `application-layer`: entry points (middleware, controllers, console commands, the module's Nova pieces) only translate input and output; the work sits in classes named after what they do, with typed input.
+- `dependency-injection`: collaborators and configuration arrive through the constructor; facades stay in entry points; interfaces only at I/O boundaries (HTTP, sockets, the clock, processes).
+- `error-handling`, `validation`: failures are typed exceptions, never `null` or `false`; input shape is validated at the entry point, business rules where the work is done.
+- `events`: reactions run after the commit, from events that say what happened.
+- `testing-architecture`: unit tests for pure logic, feature tests for use cases, fakes only at boundaries.
+- `domain-layer-cqrs`: when (rarely) a separate domain layer or read side pays off.
+- `package-boundaries`: what is public API here and how it may change.
+
+In the core: a refusal the administrator can act on extends `Wobqqq\Aegis\Exceptions\AegisException` (rendered as `{"message": …}` with its status, never logged); time comes from `Psr\Clock\ClockInterface` (bound to `Support\SystemClock` unless the application binds its own); the API controllers read their input through the form requests in `src/Http/Requests/`.
 
 ## Upgrading installed applications safely
 

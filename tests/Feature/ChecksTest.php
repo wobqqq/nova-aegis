@@ -91,16 +91,16 @@ it('reports the last dependency audit', function (): void {
 
     expect(check('advisories')->status)->toBe(Status::INFO);
 
-    $store->put(AuditResult::fromReport(['advisories' => ['acme/lib' => [['packageName' => 'acme/lib', 'title' => 'RCE', 'cve' => 'CVE-1']]]]));
+    $store->put(AuditResult::fromReport(Date::now(), ['advisories' => ['acme/lib' => [['packageName' => 'acme/lib', 'title' => 'RCE', 'cve' => 'CVE-1']]]]));
     expect(check('advisories')->status)->toBe(Status::FAIL)->and(check('advisories')->message)->toContain('acme/lib');
 
-    $store->put(AuditResult::failed('broken'));
+    $store->put(AuditResult::failed(Date::now(), 'broken'));
     expect(check('advisories')->status)->toBe(Status::WARN);
 
     $store->put(new AuditResult(Date::now()->subDays(10), [], []));
     expect(check('advisories')->status)->toBe(Status::WARN);
 
-    $store->put(AuditResult::fromReport(['advisories' => []]));
+    $store->put(AuditResult::fromReport(Date::now(), ['advisories' => []]));
     expect(check('advisories')->status)->toBe(Status::PASS);
 });
 

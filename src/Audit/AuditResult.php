@@ -23,15 +23,15 @@ final readonly class AuditResult implements JsonSerializable
     ) {
     }
 
-    public static function failed(string $error): self
+    public static function failed(CarbonInterface $ranAt, string $error): self
     {
-        return new self(Date::now(), [], [], $error);
+        return new self($ranAt, [], [], $error);
     }
 
     /**
      * @param array<mixed> $report composer audit --format=json
      */
-    public static function fromReport(array $report): self
+    public static function fromReport(CarbonInterface $ranAt, array $report): self
     {
         $advisories = [];
 
@@ -45,7 +45,7 @@ final readonly class AuditResult implements JsonSerializable
 
         $abandoned = is_array($report['abandoned'] ?? null) ? array_map(strval(...), array_keys($report['abandoned'])) : [];
 
-        return new self(Date::now(), $advisories, array_values($abandoned));
+        return new self($ranAt, $advisories, array_values($abandoned));
     }
 
     /**

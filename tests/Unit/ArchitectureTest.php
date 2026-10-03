@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Date;
 use Wobqqq\Aegis\Audit\Advisory;
 use Wobqqq\Aegis\Audit\AuditResult;
+use Wobqqq\Aegis\Audit\ComposerAudit;
 use Wobqqq\Aegis\Checks\CheckResult;
+use Wobqqq\Aegis\Exceptions\AegisException;
 use Wobqqq\Aegis\Hardening\HardeningSettings;
 use Wobqqq\Aegis\Scanners\Certificate;
 use Wobqqq\Aegis\Scanners\ScanResult;
@@ -26,7 +29,18 @@ arch('value objects are immutable')
 arch('every class is final')
     ->expect('Wobqqq\Aegis')
     ->classes()
-    ->toBeFinal();
+    ->toBeFinal()
+    ->ignoring(AegisException::class);
+
+arch('business exceptions extend the Aegis exception')
+    ->expect('Wobqqq\Aegis\Exceptions')
+    ->classes()
+    ->toExtend(AegisException::class)
+    ->ignoring(AegisException::class);
+
+arch('the scanners and checks read time from the clock')
+    ->expect(['Wobqqq\Aegis\Scanners', 'Wobqqq\Aegis\Checks', ComposerAudit::class])
+    ->not->toUse([Date::class, 'now', 'today']);
 
 arch('enums back every shared code')
     ->expect('Wobqqq\Aegis\Enums')
