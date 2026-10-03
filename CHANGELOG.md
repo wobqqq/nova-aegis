@@ -4,6 +4,8 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-03
+
 ### Changed
 
 - Internal refactoring along the architecture skills, no change for applications: the scanner refuses an unlisted target with `TargetNotListed` (same 422 answer), the checks and the audit read the time from an injected PSR clock, and the API reads its input through form requests.
@@ -51,7 +53,8 @@ Breaking for code that extends the core: every class is now final, and an applic
 - The module API (`Aegis::module()`, `Aegis::check()`, `Aegis::settings()`, `SettingsSaved`) for add-on packages.
 - `aegis:check` and `aegis:disable` console commands.
 
-[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/wobqqq/nova-aegis/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/wobqqq/nova-aegis/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/wobqqq/nova-aegis/compare/v1.1.1...v2.0.0
 [1.1.1]: https://github.com/wobqqq/nova-aegis/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/wobqqq/nova-aegis/compare/v1.0.0...v1.1.0
