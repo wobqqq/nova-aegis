@@ -52,11 +52,13 @@ A scanner only reaches the targets listed in its settings, never follows a redir
 
 Add-on packages register their own settings section, dashboard line and checks:
 
-- Admin IP Access
-- IP Blocker
-- Smart IP Blocker
-- CSP
-- Input Sanitizer
+- [Admin IP Access](https://github.com/wobqqq/nova-aegis-admin-ip-access) — open Nova only to whitelisted IPs and subnets
+- [IP Blocker](https://github.com/wobqqq/nova-aegis-ip-blocker) — block IPs and subnets from the whole application
+- [Smart IP Blocker](https://github.com/wobqqq/nova-aegis-smart-ip-blocker) — rate-limit and ban abusive IPs
+- [CSP](https://github.com/wobqqq/nova-aegis-csp) — a Content-Security-Policy header edited from Nova
+- [Input Sanitizer](https://github.com/wobqqq/nova-aegis-input-sanitizer) — block XSS, injection and traversal payloads
+
+Each module is installed with `composer require` and adds its own section to **Aegis → Settings**.
 
 ## 📦 Requirements
 
