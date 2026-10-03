@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Events;
 
-final readonly class SettingsSaved
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+
+final readonly class SettingsSaved implements ShouldDispatchAfterCommit
 {
     /**
      * @param array<string, mixed> $values
