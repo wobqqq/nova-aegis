@@ -9,6 +9,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Date;
 use Psr\Http\Message\RequestInterface;
+use Wobqqq\Aegis\Exceptions\TargetNotListed;
 use Wobqqq\Aegis\Scanners\Certificate;
 use Wobqqq\Aegis\Scanners\HttpProbe;
 use Wobqqq\Aegis\Scanners\Probes\GuzzleHttpProbe;
@@ -62,7 +63,7 @@ it('reports the sensitive paths a listed site serves', function (): void {
     scanTargets(['sensitive_file_paths' => [['path' => '.env'], ['path' => '/composer.json/']]]);
     $requested = fakeHttp(['https://aegis.test/.env' => 200, 'https://aegis.test/composer.json' => 301]);
 
-    $results = resolve(Scanner::class)->sensitiveFiles('https://aegis.test/') ?? [];
+    $results = resolve(Scanner::class)->sensitiveFiles('https://aegis.test/');
 
     expect($results)->toEqual([
         new ScanResult('https://aegis.test/.env', '200', true),
@@ -74,7 +75,7 @@ it('reports the sensitive paths a listed site serves', function (): void {
 it('never reaches a site that is not listed', function (): void {
     $requested = fakeHttp([]);
 
-    expect(resolve(Scanner::class)->sensitiveFiles('https://internal.example'))->toBeNull()
+    expect(static fn (): array => resolve(Scanner::class)->sensitiveFiles('https://internal.example'))->toThrow(TargetNotListed::class)
         ->and($requested->getArrayCopy())->toBe([]);
 });
 
@@ -103,7 +104,7 @@ it('tells open ports from closed ones on a listed server', function (): void {
     expect(collect($results)->mapWithKeys(static fn (ScanResult $result): array => [$result->target => $result->status])->all())->toBe([
         '127.0.0.1:' . $open => TcpProbe::OPEN,
         '127.0.0.1:' . $closed => TcpProbe::CLOSED,
-    ])->and(resolve(Scanner::class)->tcpPorts('192.0.2.1'))->toBeNull();
+    ])->and(static fn (): array => resolve(Scanner::class)->tcpPorts('192.0.2.1'))->toThrow(TargetNotListed::class);
 });
 
 it('dials every port within one timeout', function (): void {
@@ -142,7 +143,7 @@ it('flags an invalid certificate and one that expires soon', function (): void {
     )->all();
 
     expect($results)->toBe(['aegis.test:443' => 'valid', 'aegis.test:8443' => 'expires-soon', 'aegis.test:993' => 'invalid'])
-        ->and(resolve(Scanner::class)->tlsCertificates('other.test'))->toBeNull();
+        ->and(static fn (): array => resolve(Scanner::class)->tlsCertificates('other.test'))->toThrow(TargetNotListed::class);
 });
 
 it('answers no certificate for a host that does not listen', function (): void {

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Wobqqq\Aegis\Scanners;
 
-use Illuminate\Support\Facades\Date;
+use Carbon\CarbonImmutable;
+use Psr\Clock\ClockInterface;
+use Wobqqq\Aegis\Exceptions\TargetNotListed;
 use Wobqqq\Aegis\Settings\SettingsRepository;
 use Wobqqq\Aegis\Support\Values;
 
@@ -20,21 +22,22 @@ final readonly class Scanner
         private HttpProbe $http,
         private TcpProbe $tcp,
         private TlsProbe $tls,
+        private ClockInterface $clock,
     ) {
     }
 
     /**
-     * @return list<ScanResult>|null null when the site is not a configured target
+     * @throws TargetNotListed
+     *
+     * @return list<ScanResult>
      */
-    public function sensitiveFiles(string $site): ?array
+    public function sensitiveFiles(string $site): array
     {
         $values = $this->settings->section(ScannersModule::KEY);
         $sites = array_map(static fn (string $url): string => rtrim($url, '/'), Values::column($values, 'sensitive_file_urls', 'url'));
         $site = rtrim($site, '/');
 
-        if (!in_array($site, $sites, true)) {
-            return null;
-        }
+        throw_unless(in_array($site, $sites, true), TargetNotListed::class, $site);
 
         $paths = array_map(static fn (string $path): string => trim($path, '/'), Values::column($values, 'sensitive_file_paths', 'path'));
         $urls = array_values(array_unique(array_map(static fn (string $path): string => $site . '/' . $path, $paths)));
@@ -50,9 +53,11 @@ final readonly class Scanner
     }
 
     /**
-     * @return list<ScanResult>|null
+     * @throws TargetNotListed
+     *
+     * @return list<ScanResult>
      */
-    public function tcpPorts(string $ip): ?array
+    public function tcpPorts(string $ip): array
     {
         foreach (Values::targets($this->settings->section(ScannersModule::KEY), 'tcp_targets', 'host') as [$host, $ports]) {
             if ($host !== $ip) {
@@ -68,13 +73,15 @@ final readonly class Scanner
             return $results;
         }
 
-        return null;
+        throw new TargetNotListed($ip);
     }
 
     /**
-     * @return list<ScanResult>|null
+     * @throws TargetNotListed
+     *
+     * @return list<ScanResult>
      */
-    public function tlsCertificates(string $host): ?array
+    public function tlsCertificates(string $host): array
     {
         foreach (Values::targets($this->settings->section(ScannersModule::KEY), 'tls_targets', 'host') as [$target, $ports]) {
             if (strcasecmp($target, $host) !== 0) {
@@ -93,13 +100,13 @@ final readonly class Scanner
                     continue;
                 }
 
-                $expiresSoon = $certificate->expiresOn->lt(Date::now()->addDays(self::EXPIRY_WARNING_DAYS));
+                $expiresSoon = $certificate->expiresOn->lt(CarbonImmutable::instance($this->clock->now())->addDays(self::EXPIRY_WARNING_DAYS));
                 $results[] = new ScanResult($name, $expiresSoon ? 'expires-soon' : 'valid', $expiresSoon, $certificate->expiresOn->toDateString());
             }
 
             return $results;
         }
 
-        return null;
+        throw new TargetNotListed($host);
     }
 }

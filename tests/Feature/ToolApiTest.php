@@ -7,8 +7,10 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Process;
+use Wobqqq\Aegis\Exceptions\TargetNotListed;
 use Wobqqq\Aegis\Hardening\HardeningModule;
 use Wobqqq\Aegis\Scanners\Certificate;
 use Wobqqq\Aegis\Scanners\HttpProbe;
@@ -93,7 +95,12 @@ it('runs a scan against a listed target and refuses the others', function (): vo
     actingAs($admin = admin())->postJson('/nova-vendor/aegis/scans/sensitive-files', ['url' => 'https://aegis.test'])
         ->assertOk()->assertJsonPath('exposed', 1)->assertJsonPath('results.0.target', 'https://aegis.test/.env');
 
-    actingAs($admin)->postJson('/nova-vendor/aegis/scans/sensitive-files', ['url' => 'https://other.test'])->assertUnprocessable();
+    Exceptions::fake();
+    actingAs($admin)->postJson('/nova-vendor/aegis/scans/sensitive-files', ['url' => 'https://other.test'])
+        ->assertUnprocessable()
+        ->assertExactJson(['message' => 'This target is not listed in the scanner settings.']);
+    actingAs($admin)->postJson('/nova-vendor/aegis/scans/tcp-ports', ['host' => '192.0.2.1'])->assertUnprocessable()->assertJsonMissingPath('errors');
+    Exceptions::assertNotReported(TargetNotListed::class);
     actingAs($admin)->postJson('/nova-vendor/aegis/scans/sensitive-files', ['url' => 'file:///etc/passwd'])->assertJsonValidationErrors('url');
     actingAs($admin)->postJson('/nova-vendor/aegis/scans/tcp-ports', ['host' => 'not-an-ip'])->assertJsonValidationErrors('host');
     actingAs($admin)->postJson('/nova-vendor/aegis/scans/tcp-ports', ['host' => '127.0.0.1'])->assertOk()->assertJsonPath('exposed', 0);
