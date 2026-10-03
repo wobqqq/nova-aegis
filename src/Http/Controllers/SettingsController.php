@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Wobqqq\Aegis\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Wobqqq\Aegis\Contracts\Module;
+use Wobqqq\Aegis\Http\Requests\UpdateSettingsRequest;
 use Wobqqq\Aegis\Modules\ModuleRegistry;
 use Wobqqq\Aegis\Settings\SettingsRepository;
 
@@ -33,13 +33,10 @@ final readonly class SettingsController
         return new JsonResponse(['sections' => $sections]);
     }
 
-    public function update(Request $request, string $section): JsonResponse
+    public function update(UpdateSettingsRequest $request, string $section): JsonResponse
     {
         abort_if(!$this->modules->get($section) instanceof Module, 404);
 
-        $values = $request->input('values');
-        $values = is_array($values) ? array_filter($values, is_string(...), ARRAY_FILTER_USE_KEY) : [];
-
-        return new JsonResponse(['values' => $this->settings->save($section, $values)]);
+        return new JsonResponse(['values' => $this->settings->save($section, $request->values())]);
     }
 }
