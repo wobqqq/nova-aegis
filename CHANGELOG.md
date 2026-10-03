@@ -4,6 +4,11 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+### Changed
+
+- Internal refactoring along the architecture skills, no change for applications: the scanner refuses an unlisted target with `TargetNotListed` (same 422 answer), the checks and the audit read the time from an injected PSR clock, and the API reads its input through form requests.
+- `SettingsSaved` is dispatched after the database transaction commits, so listeners never act on values that are rolled back.
+
 ## [2.0.0] - 2026-10-01
 
 Breaking for code that extends the core: every class is now final, and an application that called `new HttpProbe()` (or the TCP / TLS probe) resolves the interface from the container instead. Modules and the settings stored in `aegis_settings` are unaffected.
